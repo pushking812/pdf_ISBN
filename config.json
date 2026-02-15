@@ -1,0 +1,1 @@
+{"headless":true,"skip_main_page":true,"use_fast_selectors":true,"max_tabs":5,"api_max_concurrent":5,"delay_after_main":[1,2],"delay_after_search":[1.5,2.5],"delay_after_click":[1,1.5],"wait_product_link":6,"verbose":false,"max_pages_pdf":10,"max_workers_pdf":4,"max_concurrent_pdf":4,"loose":false,"include_metadata":false}

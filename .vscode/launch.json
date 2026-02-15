@@ -8,7 +8,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": [".\\_books\\Izuchaem_Python_tom_1_5-E_Izdanie__2019_Mark_Lutts.pdf"]
+            "args": [".\\_books"]
         },
         {
             "name": "Python Debugger: Python File",
