@@ -22,21 +22,25 @@ from functools import partial
 import os
 
 # Импорт из предоставленных модулей
-from pdf_extract_isbn import scan_pdfs, logger as pdf_logger
-from web_scraper_isbn import (
-    search_multiple_books,
-    ScraperConfig,
-    normalize_isbn,
+from pdf_extract_isbn import (
+    find_pdf_files,
+    extract_isbn_from_pdf,
+    logger as pdf_logger,
+)
+from config import ScraperConfig
+from utils import normalize_isbn
+from drivers import create_chrome_driver
+from scraper import (
     run_api_stage,
+    async_parallel_search,
     RussianBookScraperUC,
     TabState,
     TabInfo,
-    TimeoutException,
-    NoSuchElementException,
-    By,
-    WebDriverWait,
-    EC,
 )
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 # Настройка логирования
 logging.basicConfig(
@@ -63,13 +67,112 @@ def load_config_from_json(json_path: str) -> dict:
 def merge_config(base_config: dict, cli_args: dict) -> dict:
     """
     Объединяет конфигурацию из JSON и аргументов командной строки.
-    Аргументы CLI имеют приоритет.
+    Аргументы CLI имеют приоритет. Служебные ключи (начинающиеся с _) не копируются.
     """
-    merged = base_config.copy()
+    merged = {k: v for k, v in base_config.items() if not (isinstance(k, str) and k.startswith('_'))}
     for key, value in cli_args.items():
         if value is not None:  # только если аргумент явно задан
             merged[key] = value
     return merged
+
+
+# ========== КЭШИ ДЛЯ УСКОРЕНИЯ ПОВТОРНЫХ ЗАПУСКОВ ==========
+
+CACHE_VERSION = 1
+
+# Формат PDF-кэша: ключ = "имя_файла|размер" (без пути); совпадение по имени и размеру = один файл
+# entries: { "filename.pdf|12345": { "isbn": str|None, "source": str, "mtime": int, "size": int } }
+# Формат кэша книг: { "version": 1, "entries": { "isbn13": { "title", "authors", "source", "pages", "year", ... } } }
+
+
+def load_pdf_cache(path: str) -> Dict[str, Dict[str, Any]]:
+    """Загружает кэш PDF→ISBN. Ключи в формате «имя_файла|размер». При необходимости мигрирует старый формат (путь)."""
+    if not path or not os.path.isfile(path):
+        return {}
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        if data.get('version') != CACHE_VERSION:
+            return {}
+        entries = data.get('entries', {})
+        return _migrate_pdf_cache_to_name_size(entries)
+    except Exception as e:
+        logger.warning("Не удалось загрузить PDF-кэш %s: %s", path, e)
+        return {}
+
+
+def save_pdf_cache(entries: Dict[str, Dict[str, Any]], path: str) -> None:
+    """Сохраняет кэш PDF→ISBN."""
+    if not path:
+        return
+    try:
+        os.makedirs(os.path.dirname(os.path.abspath(path)) or '.', exist_ok=True)
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump({"version": CACHE_VERSION, "entries": entries}, f, ensure_ascii=False, indent=2)
+        logger.debug("PDF-кэш сохранён: %s", path)
+    except Exception as e:
+        logger.warning("Не удалось сохранить PDF-кэш %s: %s", path, e)
+
+
+def load_isbn_cache(path: str) -> Dict[str, Dict[str, Any]]:
+    """Загружает кэш ISBN→данные книги. Возвращает словарь entries или пустой dict."""
+    if not path or not os.path.isfile(path):
+        return {}
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        if data.get('version') != CACHE_VERSION:
+            return {}
+        return data.get('entries', {})
+    except Exception as e:
+        logger.warning("Не удалось загрузить кэш книг %s: %s", path, e)
+        return {}
+
+
+def save_isbn_cache(entries: Dict[str, Dict[str, Any]], path: str) -> None:
+    """Сохраняет кэш ISBN→данные книги."""
+    if not path:
+        return
+    try:
+        os.makedirs(os.path.dirname(os.path.abspath(path)) or '.', exist_ok=True)
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump({"version": CACHE_VERSION, "entries": entries}, f, ensure_ascii=False, indent=2)
+        logger.debug("Кэш книг сохранён: %s", path)
+    except Exception as e:
+        logger.warning("Не удалось сохранить кэш книг %s: %s", path, e)
+
+
+def is_book_data_complete(record: Optional[Dict[str, Any]]) -> bool:
+    """Считаем запись полной, если есть непустое название (достаточно для отображения)."""
+    return bool(record and record.get('title'))
+
+
+def pdf_cache_key(pdf_path: str) -> Optional[str]:
+    """
+    Ключ кэша PDF: только имя файла и размер — «имя|размер».
+    Один и тот же файл в разных папках даёт один ключ; совпадение по имени и размеру = один файл.
+    """
+    try:
+        st = os.stat(pdf_path)
+        return f"{os.path.basename(pdf_path)}|{st.st_size}"
+    except OSError:
+        return None
+
+
+def _migrate_pdf_cache_to_name_size(entries: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+    """Переводит старый кэш (ключ = путь) в формат ключ = имя_файла|размер."""
+    result = {}
+    for key, value in entries.items():
+        if "|" in key and key.count("|") == 1 and isinstance(value.get("size"), (int, float)):
+            result[key] = value
+            continue
+        name = os.path.basename(key) if (os.path.sep in key or "/" in key) else key
+        size = value.get("size")
+        if size is not None:
+            result[f"{name}|{size}"] = value
+        else:
+            result[key] = value
+    return result
 
 
 # ========== ФУНКЦИИ ДЛЯ ЭТАПА СКРАПИНГА С ТАБЛИЧНЫМ ПРОГРЕССОМ ==========
@@ -85,13 +188,9 @@ def parallel_search_with_progress(
     progress_callback(index, result) вызывается, когда для ISBN с данным индексом
     получен результат (или None, если не найден).
     """
-    # Импортируем undetected_chromedriver здесь, чтобы избежать лишних зависимостей в основном модуле
-    import undetected_chromedriver as uc
-
-    # Создаём драйвер (вне контекстного менеджера, чтобы управлять вручную)
-    driver = uc.Chrome(headless=config.headless)
-    driver.set_window_size(1920, 1080)
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    # Драйвер с таймаутами и стратегией загрузки из конфига (ускоряет скрапинг)
+    driver = create_chrome_driver(config)
+    delay_tab = getattr(config, 'delay_tab_switch', 0.2)
 
     # Обработка главной страницы, если нужно
     if not config.skip_main_page:
@@ -129,7 +228,7 @@ def parallel_search_with_progress(
             handles.append(main_handle)
             for i in range(1, len(chunk)):
                 driver.switch_to.new_window('tab')
-                time.sleep(0.5)
+                time.sleep(delay_tab)
                 new_handle = driver.current_window_handle
                 if new_handle not in handles:
                     handles.append(new_handle)
@@ -168,7 +267,7 @@ def parallel_search_with_progress(
                 driver.get(search_url)
                 tab.state = TabState.SEARCHING
                 tab.search_start_time = time.time()
-                time.sleep(0.2)
+                time.sleep(delay_tab)
             except Exception as e:
                 logger.error(f"[Вкладка {tab.index}] Не удалось загрузить поиск: {e}")
                 tab.state = TabState.ERROR
@@ -352,25 +451,91 @@ async def collect_isbns_from_pdfs(
     include_metadata: bool = False,
     max_pages: int = 10,
     max_concurrent: Optional[int] = None,
-) -> List[Tuple[str, Optional[str], str]]:
-    """Асинхронно обходит директорию, извлекает ISBN из PDF-файлов (с ограничением по семафору)."""
-    results = []
-    logger.info(f"Поиск PDF в {directory}...")
-    async for pdf_path, isbn, source in scan_pdfs(
-        directory=directory,
-        max_workers=max_workers,
+    use_pdf_cache: bool = True,
+    pdf_cache: Optional[Dict[str, Dict[str, Any]]] = None,
+    pdf_cache_path: Optional[str] = None,
+    rescan: bool = False,
+) -> Tuple[List[Tuple[str, Optional[str], str]], Dict[str, Dict[str, Any]]]:
+    """
+    Асинхронно обходит директорию, извлекает ISBN из PDF (с опциональным кэшем).
+    Возвращает (результаты, обновлённый pdf_cache для сохранения).
+    """
+    from concurrent.futures import ProcessPoolExecutor
+
+    pdf_cache = pdf_cache if pdf_cache is not None else {}
+    pdf_files = await find_pdf_files(directory)
+    if not pdf_files:
+        logger.info("PDF-файлы не найдены в %s", directory)
+        return [], pdf_cache
+
+    use_cache = use_pdf_cache and not rescan
+    extract_func = partial(
+        extract_isbn_from_pdf,
         strict=strict,
         include_metadata=include_metadata,
         max_pages=max_pages,
-        max_concurrent=max_concurrent,
-    ):
-        results.append((pdf_path, isbn, source))
-        if isbn:
-            logger.debug(f"[{pdf_path}] -> ISBN: {isbn} ({source})")
+    )
+
+    cached_results: Dict[str, Tuple[Optional[str], str]] = {}
+    uncached_paths: List[str] = []
+    for path in pdf_files:
+        cache_key = pdf_cache_key(path)
+        if use_cache and cache_key and cache_key in pdf_cache:
+            entry = pdf_cache[cache_key]
+            cached_results[path] = (entry.get('isbn'), entry.get('source', 'text'))
         else:
-            logger.debug(f"[{pdf_path}] -> ISBN не найден")
-    logger.info(f"Обработано PDF: {len(results)}")
-    return results
+            uncached_paths.append(path)
+
+    if cached_results:
+        logger.info("Из PDF-кэша: %d файл(ов)", len(cached_results))
+
+    uncached_results: List[Tuple[str, Optional[str], str]] = []
+    if uncached_paths:
+        loop = asyncio.get_running_loop()
+        sem_limit = max_concurrent or max_workers or (os.cpu_count() or 4)
+        semaphore = asyncio.Semaphore(sem_limit)
+        executor = ProcessPoolExecutor(max_workers=max_workers)
+
+        async def extract_one(p: str) -> Tuple[str, Optional[str], str]:
+            async with semaphore:
+                isbn, source = await loop.run_in_executor(executor, extract_func, p)
+            return p, isbn, source
+
+        try:
+            uncached_results = await asyncio.gather(*[extract_one(p) for p in uncached_paths])
+            for path, isbn, source in uncached_results:
+                ckey = pdf_cache_key(path)
+                if ckey:
+                    try:
+                        st = os.stat(path)
+                        pdf_cache[ckey] = {
+                            "isbn": isbn,
+                            "source": source,
+                            "mtime": st.st_mtime,
+                            "size": st.st_size,
+                        }
+                    except OSError:
+                        pdf_cache[ckey] = {"isbn": isbn, "source": source}
+                if isbn:
+                    logger.debug("[%s] -> ISBN: %s (%s)", path, isbn, source)
+                else:
+                    logger.debug("[%s] -> ISBN не найден", path)
+        finally:
+            executor.shutdown(wait=True)
+
+    # Итог в порядке pdf_files
+    result_list: List[Tuple[str, Optional[str], str]] = []
+    uncached_by_path = {t[0]: (t[1], t[2]) for t in uncached_results}
+    for path in pdf_files:
+        if path in cached_results:
+            isbn, source = cached_results[path]
+            result_list.append((path, isbn, source))
+        else:
+            isbn, source = uncached_by_path[path]
+            result_list.append((path, isbn, source))
+
+    logger.info("Обработано PDF: %d (из кэша: %d, извлечено: %d)", len(result_list), len(cached_results), len(uncached_paths))
+    return result_list, pdf_cache
 
 
 def build_isbn_mapping(
@@ -466,17 +631,45 @@ def save_results_to_json(
     logger.info(f"Результаты сохранены в {output_file}")
 
 
+def load_book_data_from_results_json(path: str) -> Dict[str, Dict[str, Any]]:
+    """
+    Загружает данные о книгах из JSON-отчёта (формат --output).
+    Возвращает словарь isbn -> book_info для записей с непустым book_info.
+    """
+    if not path or not os.path.isfile(path):
+        return {}
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+    except Exception as e:
+        logger.warning("Не удалось загрузить JSON отчёта %s: %s", path, e)
+        return {}
+    result = {}
+    for record in data if isinstance(data, list) else []:
+        isbn_raw = record.get('isbn_raw')
+        book_info = record.get('book_info')
+        if not isbn_raw or not book_info or not isinstance(book_info, dict):
+            continue
+        norm = normalize_isbn(isbn_raw)
+        if norm and is_book_data_complete(book_info):
+            result[norm] = book_info
+    return result
+
+
 async def async_main(args):
     """Асинхронная основная функция."""
 
     # ---- Загрузка конфигурации ----
+    config_path = args.config
+    if config_path is None and os.path.isfile("config.json"):
+        config_path = "config.json"
     config_dict = {}
-    if args.config:
+    if config_path:
         try:
-            config_dict = load_config_from_json(args.config)
-            logger.info(f"Конфигурация загружена из {args.config}")
+            config_dict = load_config_from_json(config_path)
+            logger.info("Конфигурация загружена из %s", config_path)
         except Exception as e:
-            logger.error(f"Ошибка загрузки конфигурации: {e}")
+            logger.error("Ошибка загрузки конфигурации: %s", e)
             sys.exit(1)
 
     # Аргументы командной строки, которые переопределяют конфигурацию
@@ -498,6 +691,11 @@ async def async_main(args):
     pdf_max_pages = merged_config.get('max_pages_pdf', 10)
     pdf_max_workers = merged_config.get('max_workers_pdf', None)
     pdf_max_concurrent = merged_config.get('max_concurrent_pdf', None)
+    pdf_isbn_cache_path = merged_config.get('pdf_isbn_cache', 'pdf_isbn_cache.json')
+    isbn_data_cache_path = merged_config.get('isbn_data_cache', 'isbn_data_cache.json')
+    rescan = getattr(args, 'rescan', False)
+    use_pdf_cache = not rescan
+    use_isbn_cache = not rescan
 
     # Параметры для веб-скрапинга (ScraperConfig)
     # Создаём словарь только с теми ключами, которые есть в конструкторе ScraperConfig
@@ -509,7 +707,8 @@ async def async_main(args):
         'rate_limit_phrases', 'rate_limit_initial_delay',
         'rate_limit_coef_start', 'rate_limit_coef_step', 'rate_limit_coef_max',
         'handle_rate_limit', 'keep_browser_open', 'verbose',
-        'api_max_concurrent'
+        'api_max_concurrent',
+        'page_load_timeout', 'page_load_strategy', 'delay_tab_switch'
     ]
     web_config_dict = {k: merged_config.get(k) for k in web_config_keys if k in merged_config}
     # Если какие-то ключи не заданы, будут использованы значения по умолчанию из ScraperConfig
@@ -527,16 +726,36 @@ async def async_main(args):
         logging.getLogger().setLevel(logging.INFO)
         pdf_logger.setLevel(logging.INFO)
 
+    # ---- Кэши ----
+    pdf_cache = load_pdf_cache(pdf_isbn_cache_path) if use_pdf_cache else {}
+    isbn_cache = load_isbn_cache(isbn_data_cache_path) if use_isbn_cache else {}
+    # Дополнительно подгружаем данные из JSON-отчёта (--output), если файл есть
+    if use_isbn_cache and getattr(args, 'output', None) and os.path.isfile(args.output):
+        from_output = load_book_data_from_results_json(args.output)
+        if from_output:
+            isbn_cache.update(from_output)
+            logger.info("Добавлено из JSON-отчёта %s: %d записей", args.output, len(from_output))
+    if use_pdf_cache and pdf_cache:
+        logger.info("Загружен PDF-кэш: %s (%d записей)", pdf_isbn_cache_path, len(pdf_cache))
+    if use_isbn_cache and isbn_cache:
+        logger.info("Загружен кэш книг: %s (%d записей)", isbn_data_cache_path, len(isbn_cache))
+
     # ---- Шаг 1: извлечение ISBN из PDF ----
     logger.info("Этап 1: Извлечение ISBN из PDF-файлов")
-    pdf_results = await collect_isbns_from_pdfs(
+    pdf_results, pdf_cache = await collect_isbns_from_pdfs(
         directory=args.directory,
         max_workers=pdf_max_workers,
         strict=pdf_strict,
         include_metadata=pdf_include_metadata,
         max_pages=pdf_max_pages,
         max_concurrent=pdf_max_concurrent,
+        use_pdf_cache=use_pdf_cache,
+        pdf_cache=pdf_cache,
+        pdf_cache_path=pdf_isbn_cache_path,
+        rescan=rescan,
     )
+    if use_pdf_cache and pdf_isbn_cache_path:
+        save_pdf_cache(pdf_cache, pdf_isbn_cache_path)
 
     if not pdf_results:
         logger.warning("Не найдено PDF-файлов для обработки")
@@ -552,27 +771,36 @@ async def async_main(args):
     logger.info(f"Найдено уникальных ISBN: {len(unique_isbns)}")
     logger.debug(f"Уникальные ISBN: {unique_isbns}")
 
-    # ---- Шаг 3: поиск информации через API и РГБ ----
-    logger.info("Этап 2: Поиск через API и РГБ")
-    api_results, remaining_isbns, remaining_indices = await run_api_stage(unique_isbns, web_config)
-
-    # Собираем результаты API в словарь
-    book_data = {}
-    for i, res in enumerate(api_results):
-        if res:
-            book_data[unique_isbns[i]] = res
-
-    # ---- Шаг 4: скрапинг для оставшихся ISBN ----
-    if remaining_isbns:
-        logger.info(f"Осталось ISBN для скрапинга: {len(remaining_isbns)}")
-        scraped_results = await run_scraping_stage(remaining_isbns, remaining_indices, web_config)
-        # Обновляем book_data
-        for local_idx, res in enumerate(scraped_results):
-            if res:
-                isbn = remaining_isbns[local_idx]
-                book_data[isbn] = res
+    # ---- Шаг 3: данные по книгам (кэш + API + скрапинг) ----
+    book_data: Dict[str, Optional[Dict[str, Any]]] = {}
+    for isbn in unique_isbns:
+        if use_isbn_cache and isbn in isbn_cache and is_book_data_complete(isbn_cache[isbn]):
+            book_data[isbn] = isbn_cache[isbn]
+    remaining_to_fetch = [isbn for isbn in unique_isbns if isbn not in book_data]
+    if not remaining_to_fetch:
+        logger.info("Все ISBN найдены в кэше книг, запросы не выполняются.")
     else:
-        logger.info("Все ISBN найдены через API/РГБ, скрапинг не требуется.")
+        if use_isbn_cache and book_data:
+            logger.info("Из кэша книг: %d, запрос для: %d", len(book_data), len(remaining_to_fetch))
+        logger.info("Этап 2: Поиск через API и РГБ")
+        api_results, remaining_isbns, remaining_indices = await run_api_stage(remaining_to_fetch, web_config)
+        for i, res in enumerate(api_results):
+            if res:
+                book_data[remaining_to_fetch[i]] = res
+
+        if remaining_isbns:
+            logger.info("Осталось ISBN для скрапинга: %d", len(remaining_isbns))
+            scraped_results = await run_scraping_stage(remaining_isbns, remaining_indices, web_config)
+            for local_idx, res in enumerate(scraped_results):
+                if res:
+                    book_data[remaining_isbns[local_idx]] = res
+        else:
+            logger.info("Все запрошенные ISBN найдены через API/РГБ, скрапинг не требуется.")
+
+    # Обновляем кэш книг новыми данными и сохраняем
+    if use_isbn_cache and isbn_data_cache_path:
+        isbn_cache.update({k: v for k, v in book_data.items() if v and is_book_data_complete(v)})
+        save_isbn_cache(isbn_cache, isbn_data_cache_path)
 
     # ---- Шаг 5: вывод итоговой таблицы ----
     print_pdf_results_table(pdf_results, book_data)
@@ -605,6 +833,8 @@ def main():
                         help="Нестрогий режим поиска ISBN в PDF (без обязательного префикса ISBN)")
     parser.add_argument("--include-metadata", action="store_true",
                         help="Проверять метаданные PDF в дополнение к тексту")
+    parser.add_argument("--rescan", action="store_true",
+                        help="Игнорировать кэши PDF и книг, выполнить полное извлечение и поиск заново")
 
     args = parser.parse_args()
 

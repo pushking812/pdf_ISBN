@@ -1,0 +1,395 @@
+{
+  "version": 1,
+  "entries": {
+    "Ankur. Hands-On Python for DevOps 2024.pdf|13572839": {
+      "isbn": "9781835081167",
+      "source": "text",
+      "mtime": 1765106992.0,
+      "size": 13572839
+    },
+    "Beazley. Python Distilled 2022.pdf|44181498": {
+      "isbn": "9780134173276",
+      "source": "text",
+      "mtime": 1766959400.0,
+      "size": 44181498
+    },
+    "Beazley. Python.Distilled 2022.pdf|3116327": {
+      "isbn": "9780134173276",
+      "source": "text",
+      "mtime": 1766959485.0,
+      "size": 3116327
+    },
+    "codelibs_ru_programmirovanie_bekenda_na_python_prakticheskoe_rukovodstvo.pdf|5876984": {
+      "isbn": "9785977520966",
+      "source": "text",
+      "mtime": 1766957168.0,
+      "size": 5876984
+    },
+    "Corey.Security.Automation.with.Python 2025.pdf|41941369": {
+      "isbn": "9781805125105",
+      "source": "text",
+      "mtime": 1766958013.0,
+      "size": 41941369
+    },
+    "Cuantum. inzheneriia_dannykh_v_python_osnovy_analiza_dannykh 2024.pdf|6839992": {
+      "isbn": "9785937003812",
+      "source": "text",
+      "mtime": 1767163851.0,
+      "size": 6839992
+    },
+    "Giordani. clean.architectures.in.python 2023.pdf|3313290": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1765105273.0,
+      "size": 3313290
+    },
+    "Izuchaem_Python_Tom_1_5_izd_Mark_Lutts.pdf|60170735": {
+      "isbn": "9785907144521",
+      "source": "text",
+      "mtime": 1767123217.132973,
+      "size": 60170735
+    },
+    "Izuchaem_Python_Tom_2_5_izd_Mark_Lutts.pdf|60857654": {
+      "isbn": "9785907144538",
+      "source": "text",
+      "mtime": 1768065138.1485226,
+      "size": 60857654
+    },
+    "Jaworski. Python_Luchshie_praktiki_i_instrumenty_3_izd_2021.pdf|9213621": {
+      "isbn": "9785446115891",
+      "source": "text",
+      "mtime": 1766784972.0,
+      "size": 9213621
+    },
+    "Jay. Generative AI Apps with LangChain and Python 2024.pdf|5873202": {
+      "isbn": "9798868808814",
+      "source": "text",
+      "mtime": 1765105648.0,
+      "size": 5873202
+    },
+    "Kao. cpython_a_complete_guide_to_cpython’s_architecture_and_performance 2025.pdf|3220523": {
+      "isbn": "9798868817694",
+      "source": "text",
+      "mtime": 1766385007.0,
+      "size": 3220523
+    },
+    "Korn. Machine.Learning.in.Python.for.Everyone.pdf|37179567": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1765105751.0,
+      "size": 37179567
+    },
+    "learning.python.pdf|11047541": {
+      "isbn": "9781098171308",
+      "source": "text",
+      "mtime": 1766654305.0,
+      "size": 11047541
+    },
+    "Learning_Python_5th_Edition_Mark_Lutz.pdf|13729598": {
+      "isbn": "9781449355739",
+      "source": "text",
+      "mtime": 1768065143.0613537,
+      "size": 13729598
+    },
+    "Learning_Python_5th_Edition_Mark_Lutz_.pdf|27662692": {
+      "isbn": "9781449355739",
+      "source": "text",
+      "mtime": 1768126396.9683821,
+      "size": 27662692
+    },
+    "Learning_Python_5th_Edition_Mark_Lutz_opt.pdf|18100915": {
+      "isbn": "9781449355739",
+      "source": "text",
+      "mtime": 1768128611.5684254,
+      "size": 18100915
+    },
+    "Learning_Python_6th_Edition_Mark_Lutz.pdf|6778099": {
+      "isbn": "9781098171308",
+      "source": "text",
+      "mtime": 1767123440.0998993,
+      "size": 6778099
+    },
+    "Loredo. Learn.Quantum.Computing.with.Python.and.IBM.Quantum 2024.pdf|40792012": {
+      "isbn": "9781803244808",
+      "source": "text",
+      "mtime": 1762059894.0,
+      "size": 40792012
+    },
+    "Masis. Interpretable.Machine.Learning.with.Python 2023.pdf|55971597": {
+      "isbn": "9781803235424",
+      "source": "text",
+      "mtime": 1762059857.0,
+      "size": 55971597
+    },
+    "Matthes. python.crash.course.3rd.edition 2023.pdf|6115994": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1766958867.0,
+      "size": 6115994
+    },
+    "Maxwell. Powerful Python Patterns and Strategies with Modern Python 2025.pdf|3479732": {
+      "isbn": "9781098175702",
+      "source": "text",
+      "mtime": 1756231039.7858057,
+      "size": 3479732
+    },
+    "Olsen. mastering.python.50.specific.tips.for.writing.better.code 2023.pdf|3220504": {
+      "isbn": "9798865196815",
+      "source": "text",
+      "mtime": 1766958135.0,
+      "size": 3220504
+    },
+    "Ortega. python.for.security.and.networking 2023.pdf|8872972": {
+      "isbn": "9781837637553",
+      "source": "text",
+      "mtime": 1765104824.0,
+      "size": 8872972
+    },
+    "Stack Overflow. Samoe_poln_rukov_po_razrab_na_Python_2024.pdf|21074950": {
+      "isbn": "9785171602529",
+      "source": "text",
+      "mtime": 1750433324.0,
+      "size": 21074950
+    },
+    "Sweigart. automate.the.boring.stuff.with.python 2020.pdf|12805695": {
+      "isbn": "9781593279929",
+      "source": "text",
+      "mtime": 1765105350.0,
+      "size": 12805695
+    },
+    "Sweigart. automate.the.boring.stuff.with.python.workbook 2026.pdf|12338005": {
+      "isbn": "9781718504509",
+      "source": "text",
+      "mtime": 1765988413.0,
+      "size": 12338005
+    },
+    "Van_Der_Post VBA,_Integrating_Python_for_Enhanced_Automation.pdf|2307538": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1748094770.0,
+      "size": 2307538
+    },
+    "Абдрахманов. Python. unittest 2017.pdf|10941179": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1765105909.0,
+      "size": 10941179
+    },
+    "Бейдер. Chisty_Python 2024.pdf|8500308": {
+      "isbn": "9785446108039",
+      "source": "text",
+      "mtime": 1766957014.0,
+      "size": 8500308
+    },
+    "Бизли. Python_Ischerpyvayuschee_rukovodstvo 2023.pdf|6153315": {
+      "isbn": "9785446119561",
+      "source": "text",
+      "mtime": 1765106933.0,
+      "size": 6153315
+    },
+    "Бухарев. Хакинг на Python 2024.pdf|22446675": {
+      "isbn": "9785907592612",
+      "source": "text",
+      "mtime": 1736937688.0,
+      "size": 22446675
+    },
+    "Бэрри. izuchaem_programmirovanie_na_python 2017.pdf|9751198": {
+      "isbn": "9781491919538",
+      "source": "text",
+      "mtime": 1765106305.0,
+      "size": 9751198
+    },
+    "Васильев. programmirovanie-na-python-v-primerah-i-zadachah 2021.pdf|4726340": {
+      "isbn": "9785041031992",
+      "source": "text",
+      "mtime": 1765106031.0,
+      "size": 4726340
+    },
+    "Воган. Python_dlya_khakerov 2023.pdf|14919178": {
+      "isbn": "9785446129683",
+      "source": "text",
+      "mtime": 1765105967.0,
+      "size": 14919178
+    },
+    "Гэддис. Начинаем программировать на Python - 2019.pdf|77415569": {
+      "isbn": "9785977540025",
+      "source": "text",
+      "mtime": 1572014054.5923715,
+      "size": 77415569
+    },
+    "Дейтел. Python_Iskusstvenny_intellekt_bolshie_dannye_i_oblachnye_vychislenia 2020.pdf|12271668": {
+      "isbn": "9785446114320",
+      "source": "text",
+      "mtime": 1765106144.0,
+      "size": 12271668
+    },
+    "Диджитализируй. 12 мощных Python однострочников.pdf|3297551": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1766957049.0,
+      "size": 3297551
+    },
+    "Добряк. Python_12_уроков_для_начинающих_2023.pdf|3356245": {
+      "isbn": "9785977517997",
+      "source": "text",
+      "mtime": 1765106990.0,
+      "size": 3356245
+    },
+    "Картер. Библиотеки_Python_Часть_1 2024.pdf|13401063": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1739431592.0,
+      "size": 13401063
+    },
+    "Картер. Библиотеки_Python_Часть_2_Практическое_применение.pdf|4643527": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1739431586.0,
+      "size": 4643527
+    },
+    "Коглиати. Python_для_непрограммистов_Учимся_программировать_2024.pdf|6227057": {
+      "isbn": "9785171621988",
+      "source": "text",
+      "mtime": 1737891413.0,
+      "size": 6227057
+    },
+    "Криволапов. Matematika_na_Python.pdf|73148146": {
+      "isbn": "9785406097656",
+      "source": "text",
+      "mtime": 1738043785.0,
+      "size": 73148146
+    },
+    "Куликова. Neyroseti_na_Python 2025.pdf|28515198": {
+      "isbn": "9785907592551",
+      "source": "text",
+      "mtime": 1766957335.0,
+      "size": 28515198
+    },
+    "Левашов. Python с нуля 2024.pdf|2635404": {
+      "isbn": "9785446121458",
+      "source": "text",
+      "mtime": 1739268538.0,
+      "size": 2635404
+    },
+    "Лотт. Obektno-orientirovannyy-Python-4-e-izdanie 2024.pdf|29730120": {
+      "isbn": "9785446119950",
+      "source": "text",
+      "mtime": 1765106518.0,
+      "size": 29730120
+    },
+    "Любанович. Простой_Python_Современный_стиль_программирования.pdf|5150131": {
+      "isbn": "9785496020886",
+      "source": "text",
+      "mtime": 1765106266.0,
+      "size": 5150131
+    },
+    "Майер. Odnostrochniki_Python_lakonichnyi soderzhatelnyi kod_2022.pdf|4659479": {
+      "isbn": "9785446129669",
+      "source": "text",
+      "mtime": 1765106438.0,
+      "size": 4659479
+    },
+    "Максвелл. moshnyj_python_patterny_i_strategii_sovremennogo_programmirovaniya 2025.pdf|1181000": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1766957182.0,
+      "size": 1181000
+    },
+    "Максвелл. Мощный Python. Паттерны и стратегии современного программирования.pdf|1177775": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1770574484.6105373,
+      "size": 1177775
+    },
+    "Машнин. Sozdanie_nastolnykh_Python_prilozheniy.pdf|17698085": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1765107005.0,
+      "size": 17698085
+    },
+    "Парк. python_za_7_dney 2023.pdf|10582186": {
+      "isbn": "9785446120574",
+      "source": "text",
+      "mtime": 1765106022.0,
+      "size": 10582186
+    },
+    "Персиваль. Паттерны разработки на Python. TDD, DDD и событийно_ориентированная архитектура.pdf|7204447": {
+      "isbn": "9785446114689",
+      "source": "text",
+      "mtime": 1766957063.0,
+      "size": 7204447
+    },
+    "Портер. Программирование на Python с помощью GitHub Copilot и ChatGPТ 2024.pdf|44421374": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1762239924.446024,
+      "size": 44421374
+    },
+    "Прохоренок. Python_3_Samoe_neobkhodimoe_2019.pdf|31187000": {
+      "isbn": "9785977539944",
+      "source": "text",
+      "mtime": 1765106223.0,
+      "size": 31187000
+    },
+    "Рейтц. Avtostopom_po_Python 2017.pdf|20224699": {
+      "isbn": "9785496030236",
+      "source": "text",
+      "mtime": 1766957082.0,
+      "size": 20224699
+    },
+    "Романо. ves-python-samoe-aktualnoe-i-ischerpyvayushee-rukovodstvo-4-izd 2026.pdf|3144468": {
+      "isbn": "9786011245944",
+      "source": "text",
+      "mtime": 1767545994.0,
+      "size": 3144468
+    },
+    "Уэйд. Analitika-v-Power-BI-s-pomoshchyu-R-i-Python. 2021.pdf|18273527": {
+      "isbn": "9785970609231",
+      "source": "text",
+      "mtime": 1765106919.0,
+      "size": 18273527
+    },
+    "Фостер. Программирование_на_Python_с_нуля_Программирование.pdf|64675256": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1765106624.0,
+      "size": 64675256
+    },
+    "Хайнеман. Algoritmy_S_primerami_na_Python 2023.pdf|34662718": {
+      "isbn": "9785446119639",
+      "source": "text",
+      "mtime": 1765105954.0,
+      "size": 34662718
+    },
+    "Хиллард. Публикация_пакетов_Python_Мировой_компьютерный_бестселлер.pdf|153754392": {
+      "isbn": null,
+      "source": null,
+      "mtime": 1765106583.0,
+      "size": 153754392
+    },
+    "Хилпиш. Python_dlya_finansistov 2023.pdf|7029137": {
+      "isbn": "9785446122509",
+      "source": "text",
+      "mtime": 1765106783.0,
+      "size": 7029137
+    },
+    "Чан. Python. Быстрый старт.(2021).pdf|3581288": {
+      "isbn": "9785446118007",
+      "source": "text",
+      "mtime": 1765106154.0,
+      "size": 3581288
+    },
+    "Чоу. Python_для_сетевых_инженеров_Автоматизация_сети,_программирование.pdf|14065654": {
+      "isbn": "9785446117697",
+      "source": "text",
+      "mtime": 1734272750.0,
+      "size": 14065654
+    },
+    "Шихи. Struktury_dannykh_v_Python 2022.pdf|10770687": {
+      "isbn": "9785937001108",
+      "source": "text",
+      "mtime": 1765106443.0,
+      "size": 10770687
+    }
+  }
+}

@@ -3,6 +3,11 @@ _*/
 # *.pdf
 # downloads/
 
+venv/
+.vscode/
+.venv/
+.qodo
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

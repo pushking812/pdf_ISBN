@@ -1,0 +1,33 @@
+# Окружение и зависимости (самое тяжелое)
+venv/
+.vscode/
+.venv/
+.qodo
+env/
+bin/
+lib/
+share/
+include/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+LICENSE
+
+# Данные и кэш
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.log
+*.sqlite3
+
+# Сборка и дистрибутивы
+dist/
+build/
+*.egg-info/
+
+# Специфично для Cline (индексы)
+.cline/

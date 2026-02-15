@@ -9,7 +9,7 @@ import asyncio
 import os
 import re
 from concurrent.futures import ProcessPoolExecutor
-from typing import Optional, Tuple, List, AsyncGenerator, Union
+from typing import Optional, Tuple, List, AsyncGenerator
 import argparse
 import logging
 from functools import partial
