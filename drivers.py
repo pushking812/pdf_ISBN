@@ -12,7 +12,7 @@ def create_chrome_driver(config: ScraperConfig) -> Any:
         strategy = "eager"
     options = uc.ChromeOptions()
     options.set_capability("pageLoadStrategy", strategy)
-    driver = uc.Chrome(headless=config.headless, options=options)
+    driver = uc.Chrome(version_main=144, headless=config.headless, options=options)
     driver.set_window_size(1920, 1080)
     timeout_sec = max(5, getattr(config, 'page_load_timeout', 20))
     driver.set_page_load_timeout(timeout_sec)

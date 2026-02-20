@@ -14,7 +14,7 @@ import argparse
 import logging
 from functools import partial
 
-import fitz  # PyMuPDF
+import fitz
 
 __all__ = [
     'validate_isbn10',
