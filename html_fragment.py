@@ -24,16 +24,6 @@ def find_elements_by_text(
 ) -> List[Tag]:
     """
     Находит все элементы (теги), чей полный текст (`.get_text()`) содержит заданный текст.
-
-    Параметры:
-        soup: объект BeautifulSoup.
-        text: искомый текст.
-        exact: если True, ищет точное совпадение (после strip),
-               если False – частичное вхождение.
-        case_sensitive: учитывать регистр (по умолчанию False).
-
-    Возвращает:
-        Список найденных тегов.
     """
     def match(s: str) -> bool:
         target = s if case_sensitive else s.lower()
@@ -62,16 +52,6 @@ def find_text_nodes(
 ) -> List[PageElement]:
     """
     Находит все текстовые узлы (NavigableString), содержащие заданный текст.
-
-    Параметры:
-        soup: объект BeautifulSoup.
-        text: искомый текст.
-        exact: если True, ищет точное совпадение (после strip),
-               если False – частичное вхождение.
-        case_sensitive: учитывать регистр (по умолчанию False).
-
-    Возвращает:
-        Список найденных узлов (NavigableString).
     """
     def match(s: str) -> bool:
         target = s if case_sensitive else s.lower()
@@ -94,15 +74,6 @@ def lowest_common_ancestor(
 ) -> Optional[Tag]:
     """
     Возвращает наименьшего общего предка (LCA) двух узлов дерева BeautifulSoup.
-
-    Если один из узлов – текстовый (NavigableString), берётся его родительский тег.
-    Если узлы не имеют общего предка (разные документы), возвращается None.
-
-    Параметры:
-        node_a, node_b: узлы (Tag или NavigableString).
-
-    Возвращает:
-        Тег – общего предка или None.
     """
     # Приводим узлы к тегам (для NavigableString берём родителя)
     def to_tag(node: PageElement) -> Optional[Tag]:
@@ -151,30 +122,6 @@ def extract_common_parent_html(
 ) -> List[str]:
     """
     Извлекает HTML-фрагменты общих предков для пар «название поля – значение».
-
-    Алгоритм:
-        1. В зависимости от search_mode находит узлы или элементы,
-           содержащие label_text и value_text.
-        2. Для каждой пары (label_node, value_node) вычисляет LCA.
-        3. Собирает уникальные LCA (по id тега) и возвращает их внешний HTML.
-
-    Параметры:
-        html: HTML-строка или уже разобранный объект BeautifulSoup.
-        label_text: текст названия поля (например, "Год издания").
-        value_text: текст значения поля (например, "2020").
-        exact_label: точное совпадение для label_text.
-        exact_value: точное совпадение для value_text.
-        case_sensitive: учитывать регистр при поиске текста.
-        all_matches: если True – вернуть все найденные фрагменты,
-                     если False – только первый (или пустой список).
-        verbose: если True – выводить отладочную информацию.
-        search_mode: режим поиска узлов:
-            - "text": поиск по текстовым узлам (NavigableString).
-            - "element": поиск по элементам (тегам) с полным текстом.
-
-    Возвращает:
-        Список строк – outer HTML каждого общего предка.
-        Если пары не найдены – пустой список.
     """
     soup = html if isinstance(html, BeautifulSoup) else BeautifulSoup(html, "lxml")
 
@@ -216,11 +163,19 @@ def extract_common_parent_html(
 
     unique_ancestors = set()
     fragments = []
+    pair_index = 0
 
     for lbl in label_nodes:
         for val in value_nodes:
+            pair_index += 1
+            if verbose:
+                lbl_text = lbl.get_text(strip=True)[:50] if hasattr(lbl, 'get_text') else str(lbl)[:50]
+                val_text = val.get_text(strip=True)[:50] if hasattr(val, 'get_text') else str(val)[:50]
+                print(f"[DEBUG] Пара {pair_index}: label='{lbl_text}', value='{val_text}'")
             ancestor = lowest_common_ancestor(lbl, val)
             if ancestor is None:
+                if verbose:
+                    print(f"[DEBUG]   LCA не найден")
                 continue
             # Пропустить слишком высокие предки (body, html, document)
             if ancestor.name in ('body', 'html', '[document]'):
@@ -230,6 +185,8 @@ def extract_common_parent_html(
             # Уникальность по id объекта (так как один тег может встречаться несколько раз)
             ancestor_id = id(ancestor)
             if ancestor_id in unique_ancestors:
+                if verbose:
+                    print(f"[DEBUG] Пропущен дубликат предка {ancestor.name}")
                 continue
             unique_ancestors.add(ancestor_id)
             fragments.append(str(ancestor))
@@ -254,31 +211,12 @@ def extract_common_parent_from_url(
     all_matches: bool = True,
     verbose: bool = False,
     search_mode: str = "text",
-    use_selenium: bool = False,
     driver: Optional[WebDriver] = None,
+    use_selenium: bool = False,
     **request_kwargs,
 ) -> List[str]:
     """
     Загружает страницу по URL и извлекает фрагменты через extract_common_parent_html.
-
-    Параметры:
-        url: адрес страницы.
-        label_text, value_text: см. extract_common_parent_html.
-        exact_label, exact_value, case_sensitive, all_matches, verbose, search_mode:
-            параметры, передаваемые в extract_common_parent_html.
-        search_mode: режим поиска узлов (см. extract_common_parent_html).
-        use_selenium: если True – использовать Selenium WebDriver,
-                      если False – простой requests (статический контент).
-        driver: опционально переданный драйвер Selenium (если use_selenium=True).
-        **request_kwargs: дополнительные аргументы для requests.get().
-
-    Возвращает:
-        Список фрагментов (аналогично extract_common_parent_html).
-
-    Примечание:
-        Если use_selenium=True, но driver не передан, будет создан новый драйвер
-        (требуется установленный ChromeDriver). В настоящей реализации создание
-        драйвера не реализовано – нужно передать готовый.
     """
     if use_selenium:
         if driver is None:
@@ -318,16 +256,6 @@ def extract_common_parent_from_driver(
 ) -> List[str]:
     """
     Удобная обёртка для извлечения фрагментов из уже загруженной страницы Selenium.
-
-    Параметры:
-        driver: экземпляр Selenium WebDriver.
-        label_text, value_text: см. extract_common_parent_html.
-        exact_label, exact_value, case_sensitive, all_matches, verbose, search_mode:
-            параметры, передаваемые в extract_common_parent_html.
-        search_mode: режим поиска узлов (см. extract_common_parent_html).
-
-    Возвращает:
-        Список фрагментов.
     """
     return extract_common_parent_html(
         driver.page_source,
