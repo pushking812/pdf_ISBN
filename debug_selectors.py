@@ -79,7 +79,7 @@ def parse_arguments() -> argparse.Namespace:
         "--test",
         action="store_true",
         help="Использовать тестовый набор данных (жёстко закодированные URL и пары)",
-        default=True,
+        default=False,
     )
     parser.add_argument(
         "--search-mode",
@@ -187,16 +187,21 @@ def run_search(args: argparse.Namespace) -> bool:
     
     all_fragments = []
     
+    driver = None
     if args.selenium:
         driver = create_driver(headless=False)
-        try:
-            for url, pairs in search_data.items():
-                if args.verbose:
-                    print(f"\n🔍 Проверка URL: {url}")
+    
+    try:
+        for url, pairs in search_data.items():
+            if args.verbose:
+                print(f"\n🔍 Проверка URL: {url}")
+            if driver:
                 driver.get(url)
-                for label, value in pairs:
-                    if args.verbose:
-                        print(f"\n=== Поиск пары: '{label}' – '{value}' ===")
+            
+            for label, value in pairs:
+                if args.verbose:
+                    print(f"\n=== Поиск пары: '{label}' – '{value}' ===")
+                if driver:
                     fragments = search_with_selenium(
                         driver,
                         url,
@@ -209,28 +214,22 @@ def run_search(args: argparse.Namespace) -> bool:
                         verbose=args.verbose,
                         search_mode=args.search_mode,
                     )
-                    all_fragments.extend(fragments)
-        finally:
-            driver.quit()
-    else:
-        for url, pairs in search_data.items():
-            if args.verbose:
-                print(f"\n🔍 Проверка URL: {url}")
-            for label, value in pairs:
-                if args.verbose:
-                    print(f"\n=== Поиск пары: '{label}' – '{value}' ===")
-                fragments = search_with_requests(
-                    url,
-                    label,
-                    value,
-                    exact_label=args.exact,
-                    exact_value=args.exact,
-                    case_sensitive=args.case_sensitive,
-                    all_matches=args.all_matches,
-                    verbose=args.verbose,
-                    search_mode=args.search_mode,
-                )
+                else:
+                    fragments = search_with_requests(
+                        url,
+                        label,
+                        value,
+                        exact_label=args.exact,
+                        exact_value=args.exact,
+                        case_sensitive=args.case_sensitive,
+                        all_matches=args.all_matches,
+                        verbose=args.verbose,
+                        search_mode=args.search_mode,
+                    )
                 all_fragments.extend(fragments)
+    finally:
+        if driver:
+            driver.quit()
     
     if not all_fragments:
         print("❌ Фрагменты не найдены.")
