@@ -12,7 +12,7 @@ async def main():
     isbns = ["9781835081167", "9780134173276", "9781805125105"]  # реальные ISBN из кэша
     config = ScraperConfig()
     config.verbose = True
-    config.headless = True
+    config.headless = False
     config.max_tabs = 2
     config.api_max_concurrent = 2
     print(f"Тестируем скрапинг для {len(isbns)} ISBN")

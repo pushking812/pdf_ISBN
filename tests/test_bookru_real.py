@@ -10,7 +10,7 @@ from scraper import search_multiple_books
 
 if __name__ == "__main__":
     config = ScraperConfig(
-        headless=True,
+        headless=False,
         skip_main_page=True,
         use_fast_selectors=True,
         wait_product_link=10,

@@ -178,7 +178,7 @@ class RussianBookScraperUC:
         self.properties_content_class = "product-properties-item__content"
 
     def __enter__(self):
-        self.driver = create_chrome_driver(self.config)
+        self.driver = create__driver(self.config)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):

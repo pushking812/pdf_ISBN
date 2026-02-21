@@ -6,7 +6,7 @@ def main():
     isbns = ["9781234567890"]  # заведомо несуществующий ISBN
     config = ScraperConfig()
     config.verbose = True
-    config.headless = True
+    config.headless = False
     config.max_tabs = 2
     config.api_max_concurrent = 2
     results = search_multiple_books(isbns, config)
