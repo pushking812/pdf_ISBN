@@ -34,11 +34,6 @@ print(f"Найдено фрагментов: {len(fragments)}")
 for f in fragments:
     print(f[:200])
 
-print("\n=== Режим 'cleaned' ===")
-fragments = extract_common_parent_html(html, "Год издания:", "2022", verbose=True, search_mode="cleaned")
-print(f"Найдено фрагментов: {len(fragments)}")
-for f in fragments:
-    print(f[:200])
 
 # Также тест с тегами форматирования
 html2 = '''
@@ -52,5 +47,3 @@ fragments = extract_common_parent_html(html2, "Год издания:", "2022", 
 print(f"Режим 'text': {len(fragments)}")
 fragments = extract_common_parent_html(html2, "Год издания:", "2022", verbose=True, search_mode="element")
 print(f"Режим 'element': {len(fragments)}")
-fragments = extract_common_parent_html(html2, "Год издания:", "2022", verbose=True, search_mode="cleaned")
-print(f"Режим 'cleaned': {len(fragments)}")

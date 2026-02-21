@@ -8,38 +8,11 @@
 и возможного интеграции в парсинг данных.
 """
 
-from typing import List, Optional, Union, Tuple
-from bs4 import BeautifulSoup, NavigableString, PageElement, Tag, Comment
+from typing import List, Optional, Union
+from bs4 import BeautifulSoup, NavigableString, PageElement, Tag
 import requests
 from selenium.webdriver.remote.webdriver import WebDriver
 
-
-def clean_html_structure(soup: BeautifulSoup) -> BeautifulSoup:
-    """
-    Удаляет комментарии и объединяет смежные текстовые узлы внутри каждого тега.
-    Модифицирует переданный объект soup (in‑place) и возвращает его.
-    """
-    # Удаляем все комментарии
-    for comment in soup.find_all(text=lambda text: isinstance(text, Comment)):
-        comment.extract()
-
-    # Объединяем смежные текстовые узлы
-    for tag in soup.find_all(True):  # все теги
-        new_children = []
-        current_text = []
-        for child in tag.contents:
-            if isinstance(child, NavigableString):
-                current_text.append(child)
-            else:
-                if current_text:
-                    new_children.append(NavigableString("".join(current_text)))
-                    current_text = []
-                new_children.append(child)
-        if current_text:
-            new_children.append(NavigableString("".join(current_text)))
-        tag.contents = new_children
-
-    return soup
 
 
 def find_elements_by_text(
@@ -191,8 +164,6 @@ def extract_common_parent_html(
         search_mode: режим поиска узлов:
             - "text": поиск по текстовым узлам (NavigableString).
             - "element": поиск по элементам (тегам) с полным текстом.
-            - "cleaned": предварительная очистка комментариев и объединение
-              смежных текстовых узлов, затем поиск как в "text".
 
     Возвращает:
         Список строк – outer HTML каждого общего предка.
@@ -203,12 +174,6 @@ def extract_common_parent_html(
     if verbose:
         print(f"[DEBUG] Режим поиска: {search_mode}")
 
-    # Обработка режима cleaned
-    if search_mode == "cleaned":
-        # Создаём копию, чтобы не модифицировать исходный soup
-        soup = BeautifulSoup(str(soup), "lxml")
-        clean_html_structure(soup)
-        search_mode = "text"  # после очистки используем обычный поиск по текстовым узлам
 
     if search_mode == "text":
         label_nodes = find_text_nodes(soup, label_text, exact=exact_label, case_sensitive=case_sensitive)
@@ -217,7 +182,7 @@ def extract_common_parent_html(
         label_nodes = find_elements_by_text(soup, label_text, exact=exact_label, case_sensitive=case_sensitive)
         value_nodes = find_elements_by_text(soup, value_text, exact=exact_value, case_sensitive=case_sensitive)
     else:
-        raise ValueError(f"Неизвестный search_mode: {search_mode}. Допустимые значения: 'text', 'element', 'cleaned'.")
+        raise ValueError(f"Неизвестный search_mode: {search_mode}. Допустимые значения: 'text', 'element'.")
 
     if verbose:
         print(f"[DEBUG] Найдено узлов с label '{label_text}': {len(label_nodes)}")

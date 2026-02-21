@@ -14,7 +14,6 @@
 
 import sys
 import argparse
-from typing import List
 
 # Добавляем родительскую директорию в путь, чтобы импортировать html_fragment
 sys.path.insert(0, "..")
@@ -79,11 +78,20 @@ def main():
     )
     parser.add_argument(
         "--search-mode",
-        choices=["text", "element", "cleaned"],
+        choices=["text", "element"],
         default="element",
-        help="Режим поиска узлов: text (по текстовым узлам), element (по элементам с полным текстом), cleaned (очистка комментариев)",
+        help="Режим поиска узлов: text (по текстовым узлам), element (по элементам с полным текстом)",
     )
     args = parser.parse_args()
+    
+    search_data = {
+        "https://book.ru/book/943665": 
+            [
+                ("Год издания:", "2022"),
+                ("Авторы:", "Криволапов С.Я., Хрипунова М.Б."),
+                ("Объем:", "455 стр."),
+            ],
+        }
 
     try:
         if args.selenium:
@@ -91,31 +99,45 @@ def main():
             from config import ScraperConfig
             config = ScraperConfig(headless=False)
             driver = create_chrome_driver(config)
-            driver.get(args.url)
-            fragments = extract_common_parent_from_driver(
-                driver,
-                args.label,
-                args.value,
-                exact_label=args.exact,
-                exact_value=args.exact,
-                case_sensitive=args.case_sensitive,
-                all_matches=args.all_matches,
-                verbose=args.verbose,
-                search_mode=args.search_mode,
-            )
+            for url, pairs in search_data.items():
+                print(f"\n🔍 Проверка URL: {url}")
+                driver.get(url)
+                for label, value in pairs:
+                    print(f"\n=== Поиск пары: '{label}' – '{value}' ===")
+                    fragments = extract_common_parent_from_driver(
+                        driver,
+                        label,
+                        value,
+                        exact_label=args.exact,
+                        exact_value=args.exact,
+                        case_sensitive=args.case_sensitive,
+                        all_matches=args.all_matches,
+                        verbose=args.verbose,
+                        search_mode=args.search_mode,
+                    )
+                    print(f"Найдено фрагментов: {len(fragments)}")
+                    for i, frag in enumerate(fragments, 1):
+                        print(f"\n--- Фрагмент {i} ---")
+                        print(frag)
+                        print("-" * 30)
             driver.quit()
         else:
-            fragments = extract_common_parent_from_url(
-                args.url,
-                args.label,
-                args.value,
-                exact_label=args.exact,
-                exact_value=args.exact,
-                case_sensitive=args.case_sensitive,
-                all_matches=args.all_matches,
-                verbose=args.verbose,
-                search_mode=args.search_mode,
-            )
+            for url, pairs in search_data.items():
+                print(f"\n🔍 Проверка URL: {url}")
+                for label, value in pairs:
+                    print(f"\n=== Поиск пары: '{label}' – '{value}' ===")
+                
+                    fragments = extract_common_parent_from_url(
+                        url,
+                        label,
+                        value,
+                        exact_label=args.exact,
+                        exact_value=args.exact,
+                        case_sensitive=args.case_sensitive,
+                        all_matches=args.all_matches,
+                        verbose=args.verbose,
+                        search_mode=args.search_mode,
+                    )
 
         if not fragments:
             print("❌ Фрагменты не найдены.")
