@@ -1,7 +1,6 @@
 import pytest
 import pytest_asyncio
 import aiohttp
-import asyncio
 from pathlib import Path
 from config import ScraperConfig
 

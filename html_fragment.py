@@ -11,6 +11,7 @@
 from typing import List, Optional, Union
 from bs4 import BeautifulSoup, NavigableString, PageElement, Tag
 import requests
+import re
 from selenium.webdriver.remote.webdriver import WebDriver
 
 
@@ -38,7 +39,10 @@ def find_elements_by_text(
         target = s if case_sensitive else s.lower()
         needle = text if case_sensitive else text.lower()
         if exact:
-            return target.strip() == needle
+            # Нормализуем пробелы: удаляем лишние пробелы и приводим к одному пробелу
+            normalized_target = re.sub(r'\s+', ' ', target.strip())
+            normalized_needle = re.sub(r'\s+', ' ', needle.strip())
+            return normalized_target == normalized_needle
         else:
             return needle in target
 
@@ -73,7 +77,10 @@ def find_text_nodes(
         target = s if case_sensitive else s.lower()
         needle = text if case_sensitive else text.lower()
         if exact:
-            return target.strip() == needle
+            # Нормализуем пробелы: удаляем лишние пробелы и приводим к одному пробелу
+            normalized_target = re.sub(r'\s+', ' ', target.strip())
+            normalized_needle = re.sub(r'\s+', ' ', needle.strip())
+            return normalized_target == normalized_needle
         else:
             return needle in target
 

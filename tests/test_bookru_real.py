@@ -38,5 +38,5 @@ if __name__ == "__main__":
         if res:
             print(f"  Найдено: {res.get('title')}, автор(ы): {res.get('authors')}, страницы: {res.get('pages')}, год: {res.get('year')}, источник: {res.get('source')}")
         else:
-            print(f"  Не найдено.")
+            print("  Не найдено.")
     sys.exit(0)

@@ -1,5 +1,4 @@
 import pytest
-import asyncio
 from api_clients import (
     get_from_google_books_async,
     get_from_open_library_async,

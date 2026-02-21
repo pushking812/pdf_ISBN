@@ -56,7 +56,6 @@ def _book_ru_resource() -> Dict[str, Any]:
 
     def custom_parser(driver, resource):
         import json
-        import re
         from bs4 import BeautifulSoup
         
         soup = BeautifulSoup(driver.page_source, "lxml")
@@ -107,7 +106,7 @@ def _book_ru_resource() -> Dict[str, Any]:
                 else:
                     # result != 1 -> книга не найдена или ошибка
                     return None
-            except (json.JSONDecodeError, KeyError, IndexError) as e:
+            except (json.JSONDecodeError, KeyError, IndexError):
                 pass  # Проваливаемся на стандартный парсер
         
         # Fallback: стандартный парсинг через селекторы
