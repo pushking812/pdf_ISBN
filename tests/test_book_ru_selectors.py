@@ -9,10 +9,12 @@
 from bs4 import BeautifulSoup
 from web_scraper_isbn import _book_ru_resource, parse_book_page_for_resource
 
+
 class DummyDriver:
     def __init__(self, html: str, url: str):
         self.page_source = html
         self.current_url = url
+
 
 def test_search_result():
     """Проверка находки первой ссылки на книгу в search_result.html."""
@@ -31,6 +33,7 @@ def test_search_result():
         print("❌ Ссылка не найдена ни одним селектором.")
     return link
 
+
 def test_book_page():
     """Проверка извлечения данных из book_page.html."""
     with open("book_page.html", "r", encoding="utf-8") as f:
@@ -42,6 +45,7 @@ def test_book_page():
     for key, value in data.items():
         print(f"  {key}: {value}")
     return data
+
 
 if __name__ == "__main__":
     print("=== Тест поиска ссылки в search_result.html ===")

@@ -32,10 +32,10 @@ from utils import normalize_isbn
 from drivers import create_chrome_driver
 from scraper import (
     run_api_stage,
-    async_parallel_search,
     RussianBookScraperUC,
     TabState,
     TabInfo,
+    async_parallel_search,
 )
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -44,23 +44,23 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # Настройка логирования
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger("main")
 
 # ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
 
+
 def truncate_path(path: str, max_len: int = 60) -> str:
     """Обрезает путь, сохраняя конец, если он слишком длинный."""
     if len(path) <= max_len:
         return path
-    return "..." + path[-(max_len - 3):]
+    return "..." + path[-(max_len - 3) :]
 
 
 def load_config_from_json(json_path: str) -> dict:
     """Загружает конфигурацию из JSON-файла."""
-    with open(json_path, 'r', encoding='utf-8') as f:
+    with open(json_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -69,7 +69,11 @@ def merge_config(base_config: dict, cli_args: dict) -> dict:
     Объединяет конфигурацию из JSON и аргументов командной строки.
     Аргументы CLI имеют приоритет. Служебные ключи (начинающиеся с _) не копируются.
     """
-    merged = {k: v for k, v in base_config.items() if not (isinstance(k, str) and k.startswith('_'))}
+    merged = {
+        k: v
+        for k, v in base_config.items()
+        if not (isinstance(k, str) and k.startswith("_"))
+    }
     for key, value in cli_args.items():
         if value is not None:  # только если аргумент явно задан
             merged[key] = value
@@ -90,11 +94,11 @@ def load_pdf_cache(path: str) -> Dict[str, Dict[str, Any]]:
     if not path or not os.path.isfile(path):
         return {}
     try:
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        if data.get('version') != CACHE_VERSION:
+        if data.get("version") != CACHE_VERSION:
             return {}
-        entries = data.get('entries', {})
+        entries = data.get("entries", {})
         return _migrate_pdf_cache_to_name_size(entries)
     except Exception as e:
         logger.warning("Не удалось загрузить PDF-кэш %s: %s", path, e)
@@ -106,9 +110,14 @@ def save_pdf_cache(entries: Dict[str, Dict[str, Any]], path: str) -> None:
     if not path:
         return
     try:
-        os.makedirs(os.path.dirname(os.path.abspath(path)) or '.', exist_ok=True)
-        with open(path, 'w', encoding='utf-8') as f:
-            json.dump({"version": CACHE_VERSION, "entries": entries}, f, ensure_ascii=False, indent=2)
+        os.makedirs(os.path.dirname(os.path.abspath(path)) or ".", exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(
+                {"version": CACHE_VERSION, "entries": entries},
+                f,
+                ensure_ascii=False,
+                indent=2,
+            )
         logger.debug("PDF-кэш сохранён: %s", path)
     except Exception as e:
         logger.warning("Не удалось сохранить PDF-кэш %s: %s", path, e)
@@ -119,11 +128,11 @@ def load_isbn_cache(path: str) -> Dict[str, Dict[str, Any]]:
     if not path or not os.path.isfile(path):
         return {}
     try:
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
-        if data.get('version') != CACHE_VERSION:
+        if data.get("version") != CACHE_VERSION:
             return {}
-        return data.get('entries', {})
+        return data.get("entries", {})
     except Exception as e:
         logger.warning("Не удалось загрузить кэш книг %s: %s", path, e)
         return {}
@@ -134,17 +143,74 @@ def save_isbn_cache(entries: Dict[str, Dict[str, Any]], path: str) -> None:
     if not path:
         return
     try:
-        os.makedirs(os.path.dirname(os.path.abspath(path)) or '.', exist_ok=True)
-        with open(path, 'w', encoding='utf-8') as f:
-            json.dump({"version": CACHE_VERSION, "entries": entries}, f, ensure_ascii=False, indent=2)
+        os.makedirs(os.path.dirname(os.path.abspath(path)) or ".", exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(
+                {"version": CACHE_VERSION, "entries": entries},
+                f,
+                ensure_ascii=False,
+                indent=2,
+            )
         logger.debug("Кэш книг сохранён: %s", path)
     except Exception as e:
         logger.warning("Не удалось сохранить кэш книг %s: %s", path, e)
 
 
 def is_book_data_complete(record: Optional[Dict[str, Any]]) -> bool:
-    """Считаем запись полной, если есть непустое название (достаточно для отображения)."""
-    return bool(record and record.get('title'))
+    """
+    Считаем запись полной, если есть непустое название, авторы и год,
+    и ни одно из этих полей не содержит значений-заглушек.
+    Дополнительно проверяем pages, если поле присутствует.
+    """
+    if not record:
+        return False
+
+    title = record.get("title")
+    authors = record.get("authors")
+    year = record.get("year")
+    pages = record.get("pages")
+
+    # Заглушки для каждого поля
+    TITLE_STUBS = {"не удалось определить название", "нет названия"}
+    AUTHOR_STUBS = {"неизвестный автор"}
+    YEAR_STUBS = {"не указан", "0"}
+    PAGES_STUBS = {"не указано", "0"}
+
+    # Проверка title
+    if not title or not isinstance(title, str):
+        return False
+    title_lower = title.strip().lower()
+    if title_lower in TITLE_STUBS:
+        return False
+
+    # Проверка authors
+    if not authors or not isinstance(authors, list) or len(authors) == 0:
+        return False
+    # Проверяем, что хотя бы один автор не является заглушкой
+    all_authors_stub = all(
+        isinstance(a, str) and a.strip().lower() in AUTHOR_STUBS
+        for a in authors
+    )
+    if all_authors_stub:
+        return False
+
+    # Проверка year
+    if not year:
+        return False
+    year_str = str(year).strip().lower()
+    if year_str in YEAR_STUBS:
+        return False
+    # Дополнительно проверяем, что year содержит хотя бы одну цифру
+    if not any(ch.isdigit() for ch in year_str):
+        return False
+
+    # Проверка pages (опционально)
+    if pages is not None:
+        pages_str = str(pages).strip().lower()
+        if pages_str in PAGES_STUBS:
+            return False
+
+    return True
 
 
 def pdf_cache_key(pdf_path: str) -> Optional[str]:
@@ -159,11 +225,17 @@ def pdf_cache_key(pdf_path: str) -> Optional[str]:
         return None
 
 
-def _migrate_pdf_cache_to_name_size(entries: Dict[str, Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
+def _migrate_pdf_cache_to_name_size(
+    entries: Dict[str, Dict[str, Any]],
+) -> Dict[str, Dict[str, Any]]:
     """Переводит старый кэш (ключ = путь) в формат ключ = имя_файла|размер."""
     result = {}
     for key, value in entries.items():
-        if "|" in key and key.count("|") == 1 and isinstance(value.get("size"), (int, float)):
+        if (
+            "|" in key
+            and key.count("|") == 1
+            and isinstance(value.get("size"), (int, float))
+        ):
             result[key] = value
             continue
         name = os.path.basename(key) if (os.path.sep in key or "/" in key) else key
@@ -177,10 +249,11 @@ def _migrate_pdf_cache_to_name_size(entries: Dict[str, Dict[str, Any]]) -> Dict[
 
 # ========== ФУНКЦИИ ДЛЯ ЭТАПА СКРАПИНГА С ТАБЛИЧНЫМ ПРОГРЕССОМ ==========
 
+
 def parallel_search_with_progress(
     isbn_list: List[str],
     config: ScraperConfig,
-    progress_callback: Callable[[int, Optional[Dict[str, Any]]], None]
+    progress_callback: Callable[[int, Optional[Dict[str, Any]]], None],
 ) -> List[Optional[Dict[str, Any]]]:
     """
     Аналог async_parallel_search из web_scraper_isbn, но с вызовом callback
@@ -190,7 +263,7 @@ def parallel_search_with_progress(
     """
     # Драйвер с таймаутами и стратегией загрузки из конфига (ускоряет скрапинг)
     driver = create_chrome_driver(config)
-    delay_tab = getattr(config, 'delay_tab_switch', 0.2)
+    delay_tab = getattr(config, "delay_tab_switch", 0.2)
 
     # Обработка главной страницы, если нужно
     if not config.skip_main_page:
@@ -198,19 +271,24 @@ def parallel_search_with_progress(
         time.sleep(random.uniform(*config.delay_after_main))
         try:
             WebDriverWait(driver, config.wait_city_modal).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Да, я здесь')]"))
+                EC.element_to_be_clickable(
+                    (By.XPATH, "//button[contains(text(), 'Да, я здесь')]")
+                )
             ).click()
             if config.verbose:
                 logger.debug("Город подтверждён (главное окно)")
             time.sleep(random.uniform(*config.delay_between_actions))
-        except:
+        except Exception:
             pass
     else:
         if config.verbose:
             logger.debug("Пропускаем главную страницу")
 
     # Разбиваем список ISBN на чанки по max_tabs
-    chunks = [isbn_list[i:i + config.max_tabs] for i in range(0, len(isbn_list), config.max_tabs)]
+    chunks = [
+        isbn_list[i : i + config.max_tabs]
+        for i in range(0, len(isbn_list), config.max_tabs)
+    ]
     all_results = [None] * len(isbn_list)
     rate_limit_attempts = 0
 
@@ -219,7 +297,9 @@ def parallel_search_with_progress(
 
     for chunk_idx, chunk in enumerate(chunks):
         if config.verbose:
-            logger.debug(f"Обработка чанка {chunk_idx + 1}/{len(chunks)} (ISBN: {chunk})")
+            logger.debug(
+                f"Обработка чанка {chunk_idx + 1}/{len(chunks)} (ISBN: {chunk})"
+            )
 
         # Создание вкладок для текущего чанка
         handles = []
@@ -227,7 +307,7 @@ def parallel_search_with_progress(
             main_handle = driver.current_window_handle
             handles.append(main_handle)
             for i in range(1, len(chunk)):
-                driver.switch_to.new_window('tab')
+                driver.switch_to.new_window("tab")
                 time.sleep(delay_tab)
                 new_handle = driver.current_window_handle
                 if new_handle not in handles:
@@ -241,7 +321,9 @@ def parallel_search_with_progress(
                             found = True
                             break
                     if not found:
-                        raise Exception(f"Не удалось получить новый handle для вкладки {i}")
+                        raise Exception(
+                            f"Не удалось получить новый handle для вкладки {i}"
+                        )
         except Exception as e:
             logger.error(f"Ошибка создания вкладок для чанка {chunk_idx}: {e}")
             # Помечаем все ISBN чанка как необработанные
@@ -294,11 +376,20 @@ def parallel_search_with_progress(
                 if config.handle_rate_limit:
                     try:
                         page_source = driver.page_source
-                        found_rate_limit = any(phrase.lower() in page_source.lower() for phrase in config.rate_limit_phrases)
+                        found_rate_limit = any(
+                            phrase.lower() in page_source.lower()
+                            for phrase in config.rate_limit_phrases
+                        )
                         if found_rate_limit:
-                            logger.warning(f"[Вкладка {tab.index}] Обнаружена блокировка")
+                            logger.warning(
+                                f"[Вкладка {tab.index}] Обнаружена блокировка"
+                            )
                             rate_limit_attempts += 1
-                            coef = config.rate_limit_coef_start + (rate_limit_attempts - 1) * config.rate_limit_coef_step
+                            coef = (
+                                config.rate_limit_coef_start
+                                + (rate_limit_attempts - 1)
+                                * config.rate_limit_coef_step
+                            )
                             coef = min(coef, config.rate_limit_coef_max)
                             wait_time = config.rate_limit_initial_delay * coef
                             logger.info(f"Пауза {wait_time:.1f}с (коэф. {coef:.2f})")
@@ -307,7 +398,10 @@ def parallel_search_with_progress(
                             while True:
                                 time.sleep(config.poll_interval)
                                 page_source = driver.page_source
-                                if any(phrase.lower() in page_source.lower() for phrase in config.rate_limit_phrases):
+                                if any(
+                                    phrase.lower() in page_source.lower()
+                                    for phrase in config.rate_limit_phrases
+                                ):
                                     time.sleep(wait_time)
                                     driver.refresh()
                                 else:
@@ -320,7 +414,7 @@ def parallel_search_with_progress(
                                         driver.switch_to.window(t.handle)
                                         driver.refresh()
                                         time.sleep(0.5)
-                                    except:
+                                    except Exception:
                                         pass
                             driver.switch_to.window(tab.handle)
                             break
@@ -333,12 +427,15 @@ def parallel_search_with_progress(
                 if tab.state == TabState.SEARCHING:
                     try:
                         page_source = driver.page_source
-                        if any(phrase in page_source for phrase in config.no_product_phrases):
+                        if any(
+                            phrase in page_source
+                            for phrase in config.no_product_phrases
+                        ):
                             logger.debug(f"[Вкладка {tab.index}] Товар не найден")
                             tab.state = TabState.ERROR
                             progress_callback(tab.index, None)
                             continue
-                    except:
+                    except Exception:
                         pass
 
                     elapsed = time.time() - tab.search_start_time
@@ -351,7 +448,7 @@ def parallel_search_with_progress(
                         except NoSuchElementException:
                             continue
                     if found_link:
-                        tab.book_url = found_link.get_attribute('href')
+                        tab.book_url = found_link.get_attribute("href")
                         driver.get(tab.book_url)
                         time.sleep(random.uniform(*config.delay_after_click))
                         tab.state = TabState.BOOK_PAGE
@@ -386,7 +483,7 @@ def parallel_search_with_progress(
             try:
                 driver.switch_to.window(handle)
                 driver.close()
-            except:
+            except Exception:
                 pass
         driver.switch_to.window(main_handle)
         time.sleep(1)
@@ -403,46 +500,50 @@ def parallel_search_with_progress(
 async def run_scraping_stage(
     isbn_list: List[str],
     indices: List[int],  # не используется, оставлено для совместимости
-    config: ScraperConfig
+    config: ScraperConfig,
 ) -> List[Optional[Dict[str, Any]]]:
     """
-    Запускает скрапинг Читай-города для списка ISBN с выводом прогресса в таблицу.
+    Запускает скрапинг по всем ресурсам (Читай-город, Book.ru, РГБ) для списка ISBN
+    с выводом прогресса в таблицу.
     Возвращает список результатов (размер равен len(isbn_list)) в порядке isbn_list.
     """
     if not isbn_list:
         return []
 
-    print(f"\n🔍 Скрапинг Читай-город для {len(isbn_list)} ISBN (параллельно):")
+    print(f"\n🔍 Скрапинг по всем ресурсам для {len(isbn_list)} ISBN (параллельно):")
     header = f"{' №':>4} | {'ISBN':<20} | {'Статус':<25} | {'Название'}"
     print(header)
     print("-" * len(header))
 
-    results = [None] * len(isbn_list)
+    # Включаем подробный вывод, чтобы видеть ход перебора ресурсов
+    original_verbose = config.verbose
+    config.verbose = True
 
-    def progress_callback(idx: int, res: Optional[Dict[str, Any]]):
-        # idx - локальный индекс в isbn_list (0..len(isbn_list)-1)
-        isbn = isbn_list[idx]
+    # Запускаем многресурсный скрапинг
+    scraped_results = await async_parallel_search(isbn_list, config)
+
+    # Восстанавливаем оригинальный уровень verbosity
+    config.verbose = original_verbose
+
+    # Выводим итоговую таблицу
+    for idx, (isbn, res) in enumerate(zip(isbn_list, scraped_results)):
         if res:
-            title = res.get('title', '')[:47] + '...' if len(res.get('title', '')) > 50 else res.get('title', '')
-            status = f"✅ Найдено ({res.get('source', 'Читай-город')})"
-            print(f"{idx+1:4} | {isbn:<20} | {status:<25} | {title}")
+            title = (
+                res.get("title", "")[:47] + "..."
+                if len(res.get("title", "")) > 50
+                else res.get("title", "")
+            )
+            status = f"✅ Найдено ({res.get('source', 'скрапинг')})"
+            print(f"{idx + 1:4} | {isbn:<20} | {status:<25} | {title}")
         else:
-            print(f"{idx+1:4} | {isbn:<20} | {'❌ Не найдено':<25} |")
+            print(f"{idx + 1:4} | {isbn:<20} | {'❌ Не найдено':<25} |")
 
-    # Запускаем синхронную функцию parallel_search_with_progress в executor
-    loop = asyncio.get_running_loop()
-    scraped_results = await loop.run_in_executor(
-        None,
-        parallel_search_with_progress,
-        isbn_list,
-        config,
-        progress_callback
-    )
     print("-" * len(header))
     return scraped_results
 
 
 # ========== ОСНОВНАЯ ЛОГИКА ==========
+
 
 async def collect_isbns_from_pdfs(
     directory: str,
@@ -482,7 +583,7 @@ async def collect_isbns_from_pdfs(
         cache_key = pdf_cache_key(path)
         if use_cache and cache_key and cache_key in pdf_cache:
             entry = pdf_cache[cache_key]
-            cached_results[path] = (entry.get('isbn'), entry.get('source', 'text'))
+            cached_results[path] = (entry.get("isbn"), entry.get("source", "text"))
         else:
             uncached_paths.append(path)
 
@@ -502,7 +603,9 @@ async def collect_isbns_from_pdfs(
             return p, isbn, source
 
         try:
-            uncached_results = await asyncio.gather(*[extract_one(p) for p in uncached_paths])
+            uncached_results = await asyncio.gather(
+                *[extract_one(p) for p in uncached_paths]
+            )
             for path, isbn, source in uncached_results:
                 ckey = pdf_cache_key(path)
                 if ckey:
@@ -534,12 +637,17 @@ async def collect_isbns_from_pdfs(
             isbn, source = uncached_by_path[path]
             result_list.append((path, isbn, source))
 
-    logger.info("Обработано PDF: %d (из кэша: %d, извлечено: %d)", len(result_list), len(cached_results), len(uncached_paths))
+    logger.info(
+        "Обработано PDF: %d (из кэша: %d, извлечено: %d)",
+        len(result_list),
+        len(cached_results),
+        len(uncached_paths),
+    )
     return result_list, pdf_cache
 
 
 def build_isbn_mapping(
-    pdf_results: List[Tuple[str, Optional[str], str]]
+    pdf_results: List[Tuple[str, Optional[str], str]],
 ) -> Tuple[Dict[str, List[Tuple[str, str, str]]], List[str]]:
     """
     Строит словарь: isbn -> список (путь_к_pdf, источник, isbn_raw).
@@ -561,7 +669,7 @@ def build_isbn_mapping(
 
 def print_pdf_results_table(
     pdf_results: List[Tuple[str, Optional[str], str]],
-    book_data: Dict[str, Optional[Dict[str, Any]]]
+    book_data: Dict[str, Optional[Dict[str, Any]]],
 ) -> None:
     """Выводит итоговую таблицу с результатами для каждого PDF."""
     print("\n" + "=" * 140)
@@ -574,30 +682,59 @@ def print_pdf_results_table(
 
     for pdf_path, isbn, src in pdf_results:
         display_path = truncate_path(pdf_path, 60)
+        # Гарантируем, что src — строка
+        if src is None:
+            src = "—"
+        if isbn is None:
+            isbn = ""
 
         if not isbn:
-            print(f"{display_path:<60} {'—':<20} {'—':<10} {'❌ ISBN не найден':<40} {'':<30} {'':<6} {'':<5}")
+            print(
+                f"{display_path:<60} {'—':<20} {'—':<10} {'❌ ISBN не найден':<40} {'':<30} {'':<6} {'':<5}"
+            )
             continue
 
         norm_isbn = normalize_isbn(isbn)
         if not norm_isbn:
-            print(f"{display_path:<60} {isbn:<20} {src:<10} {'⚠️ Некорректный ISBN':<40} {'':<30} {'':<6} {'':<5}")
+            print(
+                f"{display_path:<60} {isbn:<20} {'—':<10} {'⚠️ Некорректный ISBN':<40} {'':<30} {'':<6} {'':<5}"
+            )
             continue
 
         data = book_data.get(norm_isbn)
         if not data:
-            print(f"{display_path:<60} {isbn:<20} {src:<10} {'❌ Информация не найдена':<40} {'':<30} {'':<6} {'':<5}")
+            print(
+                f"{display_path:<60} {isbn:<20} {'—':<10} {'❌ Информация не найдена':<40} {'':<30} {'':<6} {'':<5}"
+            )
             continue
 
-        # Усекаем длинные строки
-        title = data.get('title', '')[:37] + '...' if len(data.get('title', '')) > 40 else data.get('title', '')
-        authors = ', '.join(data.get('authors', []))[:27] + '...' if len(', '.join(data.get('authors', []))) > 30 else ', '.join(data.get('authors', []))
-        pages = data.get('pages', '—')
-        year = data.get('year', '—')
-        source_web = data.get('source', '—')
+        # Определяем источник для отображения
+        display_source = data.get("source")
+        if not display_source:
+            display_source = src
+        # Обрезаем до 10 символов для столбца
+        if len(display_source) > 10:
+            display_source = display_source[:9] + "…"
+
+        # Усекаем длинные строки, гарантируем, что значения не None
+        title_raw = data.get("title")
+        if title_raw is None:
+            title_raw = ""
+        title = (title_raw[:37] + "..." if len(title_raw) > 40 else title_raw)
+
+        authors_raw = data.get("authors")
+        if authors_raw is None:
+            authors_raw = []
+        authors_str = ", ".join(authors_raw)
+        authors = (authors_str[:27] + "..." if len(authors_str) > 30 else authors_str)
+
+        pages_raw = data.get("pages")
+        pages = str(pages_raw) if pages_raw is not None else "—"
+        year_raw = data.get("year")
+        year = str(year_raw) if year_raw is not None else "—"
 
         print(
-            f"{display_path:<60} {isbn:<20} {src:<10} "
+            f"{display_path:<60} {isbn:<20} {display_source:<10} "
             f"{title:<40} {authors:<30} {pages:<6} {year:<5} "
         )
     print("=" * 140)
@@ -606,7 +743,7 @@ def print_pdf_results_table(
 def save_results_to_json(
     pdf_results: List[Tuple[str, Optional[str], str]],
     book_data: Dict[str, Optional[Dict[str, Any]]],
-    output_file: str
+    output_file: str,
 ) -> None:
     """Сохраняет результаты в JSON-файл."""
     output = []
@@ -626,7 +763,7 @@ def save_results_to_json(
             record["book_info"] = None
         output.append(record)
 
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
     logger.info(f"Результаты сохранены в {output_file}")
 
@@ -639,15 +776,15 @@ def load_book_data_from_results_json(path: str) -> Dict[str, Dict[str, Any]]:
     if not path or not os.path.isfile(path):
         return {}
     try:
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
     except Exception as e:
         logger.warning("Не удалось загрузить JSON отчёта %s: %s", path, e)
         return {}
     result = {}
     for record in data if isinstance(data, list) else []:
-        isbn_raw = record.get('isbn_raw')
-        book_info = record.get('book_info')
+        isbn_raw = record.get("isbn_raw")
+        book_info = record.get("book_info")
         if not isbn_raw or not book_info or not isinstance(book_info, dict):
             continue
         norm = normalize_isbn(isbn_raw)
@@ -675,42 +812,60 @@ async def async_main(args):
     # Аргументы командной строки, которые переопределяют конфигурацию
     cli_overrides = {}
     if args.headless is not None:
-        cli_overrides['headless'] = args.headless
+        cli_overrides["headless"] = args.headless
     if args.verbose is not None:
-        cli_overrides['verbose'] = args.verbose
+        cli_overrides["verbose"] = args.verbose
     if args.max_pages is not None:
-        cli_overrides['max_pages_pdf'] = args.max_pages  # для этапа PDF
+        cli_overrides["max_pages_pdf"] = args.max_pages  # для этапа PDF
     if args.workers is not None:
-        cli_overrides['max_workers_pdf'] = args.workers
+        cli_overrides["max_workers_pdf"] = args.workers
 
     merged_config = merge_config(config_dict, cli_overrides)
 
     # Параметры для этапа извлечения из PDF
-    pdf_strict = not merged_config.get('loose', False)
-    pdf_include_metadata = merged_config.get('include_metadata', False)
-    pdf_max_pages = merged_config.get('max_pages_pdf', 10)
-    pdf_max_workers = merged_config.get('max_workers_pdf', None)
-    pdf_max_concurrent = merged_config.get('max_concurrent_pdf', None)
-    pdf_isbn_cache_path = merged_config.get('pdf_isbn_cache', 'pdf_isbn_cache.json')
-    isbn_data_cache_path = merged_config.get('isbn_data_cache', 'isbn_data_cache.json')
-    rescan = getattr(args, 'rescan', False)
+    pdf_strict = not merged_config.get("loose", False)
+    pdf_include_metadata = merged_config.get("include_metadata", False)
+    pdf_max_pages = merged_config.get("max_pages_pdf", 10)
+    pdf_max_workers = merged_config.get("max_workers_pdf", None)
+    pdf_max_concurrent = merged_config.get("max_concurrent_pdf", None)
+    pdf_isbn_cache_path = merged_config.get("pdf_isbn_cache", "pdf_isbn_cache.json")
+    isbn_data_cache_path = merged_config.get("isbn_data_cache", "isbn_data_cache.json")
+    rescan = getattr(args, "rescan", False)
     use_pdf_cache = not rescan
     use_isbn_cache = not rescan
 
     # Параметры для веб-скрапинга (ScraperConfig)
     # Создаём словарь только с теми ключами, которые есть в конструкторе ScraperConfig
     web_config_keys = [
-        'headless', 'base_url', 'skip_main_page', 'use_fast_selectors',
-        'delay_after_main', 'delay_after_search', 'delay_after_click',
-        'delay_between_actions', 'wait_city_modal', 'wait_product_link',
-        'poll_interval', 'no_product_phrases', 'max_tabs',
-        'rate_limit_phrases', 'rate_limit_initial_delay',
-        'rate_limit_coef_start', 'rate_limit_coef_step', 'rate_limit_coef_max',
-        'handle_rate_limit', 'keep_browser_open', 'verbose',
-        'api_max_concurrent',
-        'page_load_timeout', 'page_load_strategy', 'delay_tab_switch'
+        "headless",
+        "base_url",
+        "skip_main_page",
+        "use_fast_selectors",
+        "delay_after_main",
+        "delay_after_search",
+        "delay_after_click",
+        "delay_between_actions",
+        "wait_city_modal",
+        "wait_product_link",
+        "poll_interval",
+        "no_product_phrases",
+        "max_tabs",
+        "rate_limit_phrases",
+        "rate_limit_initial_delay",
+        "rate_limit_coef_start",
+        "rate_limit_coef_step",
+        "rate_limit_coef_max",
+        "handle_rate_limit",
+        "keep_browser_open",
+        "verbose",
+        "api_max_concurrent",
+        "page_load_timeout",
+        "page_load_strategy",
+        "delay_tab_switch",
     ]
-    web_config_dict = {k: merged_config.get(k) for k in web_config_keys if k in merged_config}
+    web_config_dict = {
+        k: merged_config.get(k) for k in web_config_keys if k in merged_config
+    }
     # Если какие-то ключи не заданы, будут использованы значения по умолчанию из ScraperConfig
     web_config = ScraperConfig(**web_config_dict)
 
@@ -730,15 +885,21 @@ async def async_main(args):
     pdf_cache = load_pdf_cache(pdf_isbn_cache_path) if use_pdf_cache else {}
     isbn_cache = load_isbn_cache(isbn_data_cache_path) if use_isbn_cache else {}
     # Дополнительно подгружаем данные из JSON-отчёта (--output), если файл есть
-    if use_isbn_cache and getattr(args, 'output', None) and os.path.isfile(args.output):
+    if use_isbn_cache and getattr(args, "output", None) and os.path.isfile(args.output):
         from_output = load_book_data_from_results_json(args.output)
         if from_output:
             isbn_cache.update(from_output)
-            logger.info("Добавлено из JSON-отчёта %s: %d записей", args.output, len(from_output))
+            logger.info(
+                "Добавлено из JSON-отчёта %s: %d записей", args.output, len(from_output)
+            )
     if use_pdf_cache and pdf_cache:
-        logger.info("Загружен PDF-кэш: %s (%d записей)", pdf_isbn_cache_path, len(pdf_cache))
+        logger.info(
+            "Загружен PDF-кэш: %s (%d записей)", pdf_isbn_cache_path, len(pdf_cache)
+        )
     if use_isbn_cache and isbn_cache:
-        logger.info("Загружен кэш книг: %s (%d записей)", isbn_data_cache_path, len(isbn_cache))
+        logger.info(
+            "Загружен кэш книг: %s (%d записей)", isbn_data_cache_path, len(isbn_cache)
+        )
 
     # ---- Шаг 1: извлечение ISBN из PDF ----
     logger.info("Этап 1: Извлечение ISBN из PDF-файлов")
@@ -774,32 +935,48 @@ async def async_main(args):
     # ---- Шаг 3: данные по книгам (кэш + API + скрапинг) ----
     book_data: Dict[str, Optional[Dict[str, Any]]] = {}
     for isbn in unique_isbns:
-        if use_isbn_cache and isbn in isbn_cache and is_book_data_complete(isbn_cache[isbn]):
+        if (
+            use_isbn_cache
+            and isbn in isbn_cache
+            and is_book_data_complete(isbn_cache[isbn])
+        ):
             book_data[isbn] = isbn_cache[isbn]
     remaining_to_fetch = [isbn for isbn in unique_isbns if isbn not in book_data]
     if not remaining_to_fetch:
         logger.info("Все ISBN найдены в кэше книг, запросы не выполняются.")
     else:
         if use_isbn_cache and book_data:
-            logger.info("Из кэша книг: %d, запрос для: %d", len(book_data), len(remaining_to_fetch))
+            logger.info(
+                "Из кэша книг: %d, запрос для: %d",
+                len(book_data),
+                len(remaining_to_fetch),
+            )
         logger.info("Этап 2: Поиск через API и РГБ")
-        api_results, remaining_isbns, remaining_indices = await run_api_stage(remaining_to_fetch, web_config)
+        api_results, remaining_isbns, remaining_indices = await run_api_stage(
+            remaining_to_fetch, web_config
+        )
         for i, res in enumerate(api_results):
             if res:
                 book_data[remaining_to_fetch[i]] = res
 
         if remaining_isbns:
             logger.info("Осталось ISBN для скрапинга: %d", len(remaining_isbns))
-            scraped_results = await run_scraping_stage(remaining_isbns, remaining_indices, web_config)
+            scraped_results = await run_scraping_stage(
+                remaining_isbns, remaining_indices, web_config
+            )
             for local_idx, res in enumerate(scraped_results):
                 if res:
                     book_data[remaining_isbns[local_idx]] = res
         else:
-            logger.info("Все запрошенные ISBN найдены через API/РГБ, скрапинг не требуется.")
+            logger.info(
+                "Все запрошенные ISBN найдены через API/РГБ, скрапинг не требуется."
+            )
 
     # Обновляем кэш книг новыми данными и сохраняем
     if use_isbn_cache and isbn_data_cache_path:
-        isbn_cache.update({k: v for k, v in book_data.items() if v and is_book_data_complete(v)})
+        isbn_cache.update(
+            {k: v for k, v in book_data.items() if v and is_book_data_complete(v)}
+        )
         save_isbn_cache(isbn_cache, isbn_data_cache_path)
 
     # ---- Шаг 5: вывод итоговой таблицы ----
@@ -815,26 +992,52 @@ def main():
         description="Извлечение ISBN из PDF и поиск информации о книгах (API + скрапинг)"
     )
     parser.add_argument("directory", help="Корневая директория для поиска PDF")
-    parser.add_argument("--headless", action="store_true",
-                        help="Запускать браузер в фоновом режиме")
-    parser.add_argument("--config", type=str, default=None,
-                        help="Путь к JSON-файлу конфигурации (см. пример)")
-    parser.add_argument("--verbose", "-v", action="store_true",
-                        help="Подробный вывод")
-    parser.add_argument("--output", "-o", type=str, default=None,
-                        help="Сохранить результаты в JSON-файл")
+    parser.add_argument(
+        "--headless", action="store_true", help="Запускать браузер в фоновом режиме"
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Путь к JSON-файлу конфигурации (см. пример)",
+    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Подробный вывод")
+    parser.add_argument(
+        "--output",
+        "-o",
+        type=str,
+        default=None,
+        help="Сохранить результаты в JSON-файл",
+    )
 
     # Дополнительные часто используемые параметры, которые можно переопределить
-    parser.add_argument("--max-pages", type=int, default=None,
-                        help="Максимальное число страниц для анализа PDF (0 = все)")
-    parser.add_argument("--workers", type=int, default=None,
-                        help="Количество процессов для извлечения ISBN (по умолчанию число ядер CPU)")
-    parser.add_argument("--loose", action="store_true",
-                        help="Нестрогий режим поиска ISBN в PDF (без обязательного префикса ISBN)")
-    parser.add_argument("--include-metadata", action="store_true",
-                        help="Проверять метаданные PDF в дополнение к тексту")
-    parser.add_argument("--rescan", action="store_true",
-                        help="Игнорировать кэши PDF и книг, выполнить полное извлечение и поиск заново")
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=None,
+        help="Максимальное число страниц для анализа PDF (0 = все)",
+    )
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=None,
+        help="Количество процессов для извлечения ISBN (по умолчанию число ядер CPU)",
+    )
+    parser.add_argument(
+        "--loose",
+        action="store_true",
+        help="Нестрогий режим поиска ISBN в PDF (без обязательного префикса ISBN)",
+    )
+    parser.add_argument(
+        "--include-metadata",
+        action="store_true",
+        help="Проверять метаданные PDF в дополнение к тексту",
+    )
+    parser.add_argument(
+        "--rescan",
+        action="store_true",
+        help="Игнорировать кэши PDF и книг, выполнить полное извлечение и поиск заново",
+    )
 
     args = parser.parse_args()
 

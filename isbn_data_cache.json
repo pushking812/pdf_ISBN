@@ -4,28 +4,29 @@
     "9781835081167": {
       "title": "Hands-On Python for DevOps",
       "authors": [
-        "ANKUR. ROY"
+        "Ankur Roy"
       ],
-      "source": "Google Books",
-      "pages": "0",
+      "source": "Open Library",
+      "pages": null,
       "year": "2024"
     },
     "9780134173276": {
-      "title": "Python Distilled",
+      "title": "Python Essential Reference",
       "authors": [
         "David M. Beazley"
       ],
-      "source": "Google Books",
-      "pages": "0",
-      "year": "2021"
+      "source": "Open Library",
+      "pages": "750",
+      "year": "2019"
     },
     "9781805125105": {
       "title": "Security Automation with Python",
       "authors": [
-        "Corey Charles Sr."
+        "Corey Charles Sr.",
+        "Frank McMahon"
       ],
-      "source": "Google Books",
-      "pages": "0",
+      "source": "Open Library",
+      "pages": null,
       "year": "2025"
     },
     "9785446115891": {
@@ -43,8 +44,8 @@
       "authors": [
         "Rabi Jay"
       ],
-      "source": "Google Books",
-      "pages": "0",
+      "source": "Open Library",
+      "pages": "350",
       "year": "2024"
     },
     "9798868817694": {
@@ -59,10 +60,11 @@
     "9781098171308": {
       "title": "Learning Python",
       "authors": [
-        "Mark Lutz"
+        "Mark Lutz",
+        "David Ascher"
       ],
-      "source": "Google Books",
-      "pages": "0",
+      "source": "Open Library",
+      "pages": "1128",
       "year": "2025"
     },
     "9781449355739": {
@@ -80,17 +82,17 @@
       "authors": [
         "Robert Loredo"
       ],
-      "source": "Google Books",
-      "pages": "0",
-      "year": "2025"
+      "source": "Open Library",
+      "pages": null,
+      "year": "2022"
     },
     "9781803235424": {
       "title": "Interpretable Machine Learning with Python",
       "authors": [
-        "Serg Masís"
+        "Serg Masis"
       ],
-      "source": "Google Books",
-      "pages": "0",
+      "source": "Open Library",
+      "pages": null,
       "year": "2022"
     },
     "9781098175702": {
@@ -98,17 +100,17 @@
       "authors": [
         "Aaron Maxwell"
       ],
-      "source": "Google Books",
-      "pages": "0",
-      "year": "2025"
+      "source": "Open Library",
+      "pages": "200",
+      "year": "2024"
     },
     "9781837637553": {
       "title": "Python for Security and Networking",
       "authors": [
         "José Manuel Ortega"
       ],
-      "source": "Google Books",
-      "pages": "0",
+      "source": "Open Library",
+      "pages": null,
       "year": "2023"
     },
     "9781593279929": {
@@ -418,6 +420,36 @@
       "year": "2023",
       "url": "https://www.chitai-gorod.ru/product/python-12-urokov-dlya-nachinayushchih-2990670",
       "source": "Читай-город"
+    },
+    "9798865196815": {
+      "title": "Не удалось определить название",
+      "authors": [
+        "Неизвестный автор"
+      ],
+      "pages": "не указано",
+      "year": "не указан",
+      "url": "https://search.rsl.ru/ru/search?q=9798865196815",
+      "source": "РГБ"
+    },
+    "9785406097656": {
+      "title": "Математика на Python",
+      "authors": [
+        "Криволапов С.Я., Хрипунова М.Б."
+      ],
+      "pages": "455",
+      "year": "2022",
+      "url": "https://book.ru/book/943665",
+      "source": "Book.ru"
+    },
+    "9785937003812": {
+      "title": "Не удалось определить название",
+      "authors": [
+        "Неизвестный автор"
+      ],
+      "pages": "не указано",
+      "year": "не указан",
+      "url": "https://search.rsl.ru/ru/search?q=9785937003812",
+      "source": "РГБ"
     }
   }
 }

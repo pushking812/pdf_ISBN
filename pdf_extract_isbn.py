@@ -15,13 +15,14 @@ import logging
 from functools import partial
 
 import fitz  # PyMuPDF
+from utils import replace_similar_digits
 
 __all__ = [
-    'validate_isbn10',
-    'validate_isbn13',
-    'find_isbn_in_text',
-    'extract_isbn_from_pdf',
-    'scan_pdfs',
+    "validate_isbn10",
+    "validate_isbn13",
+    "find_isbn_in_text",
+    "extract_isbn_from_pdf",
+    "scan_pdfs",
 ]
 
 # Настройка логгера
@@ -39,7 +40,7 @@ def validate_isbn10(isbn: str) -> bool:
             return False
         total += int(isbn[i]) * (10 - i)
     last = isbn[9]
-    if last == 'X':
+    if last == "X":
         total += 10
     elif last.isdigit():
         total += int(last)
@@ -67,21 +68,23 @@ def find_isbn_in_text(text: str, strict: bool = True) -> Optional[str]:
     strict=True: требует наличия префикса 'ISBN' перед номером.
     strict=False: ищет любую последовательность, похожую на ISBN.
     """
+    # Заменяем похожие на цифры символы (О/O -> 0 и т.д.) во всём тексте
+    text = replace_similar_digits(text)
     # Сначала ISBN-13 (978/979), иначе первые 10 цифр ISBN-13 ошибочно матчатся как ISBN-10
     if strict:
         patterns = [
-            r'(?:ISBN(?:-13)?:?\s*)?((?:97[89])[-\s]?(?:\d[-\s]?){9}\d)',  # ISBN-13
-            r'(?:ISBN(?:-10)?:?\s*)?((?:\d[-\s]?){9}[\dX])',                 # ISBN-10
+            r"(?:ISBN(?:-13)?:?\s*)?((?:97[89])[-\s]?(?:\d[-\s]?){9}\d)",  # ISBN-13
+            r"(?:ISBN(?:-10)?:?\s*)?((?:\d[-\s]?){9}[\dX])",  # ISBN-10
         ]
     else:
         patterns = [
-            r'((?:97[89])[-\s]?(?:\d[-\s]?){9}\d)',  # ISBN-13 без префикса
-            r'((?:\d[-\s]?){9}[\dX])',               # ISBN-10 без префикса
+            r"((?:97[89])[-\s]?(?:\d[-\s]?){9}\d)",  # ISBN-13 без префикса
+            r"((?:\d[-\s]?){9}[\dX])",  # ISBN-10 без префикса
         ]
     for pat in patterns:
         for match in re.finditer(pat, text, re.IGNORECASE):
             candidate = match.group(1)
-            clean = re.sub(r'[^\dX]', '', candidate)
+            clean = re.sub(r"[^\dX]", "", candidate)
             if len(clean) == 13 and validate_isbn13(clean):
                 return clean
             if len(clean) == 10 and validate_isbn10(clean):
@@ -90,7 +93,9 @@ def find_isbn_in_text(text: str, strict: bool = True) -> Optional[str]:
 
 
 # ---------- Извлечение из PDF (внутренние функции, вызываются в процессах) ----------
-def _extract_from_text(pdf_path: str, strict: bool, max_pages: int) -> Tuple[Optional[str], str]:
+def _extract_from_text(
+    pdf_path: str, strict: bool, max_pages: int
+) -> Tuple[Optional[str], str]:
     """Извлекает ISBN из текста PDF (первые max_pages страниц)."""
     try:
         doc = fitz.open(pdf_path)
@@ -101,10 +106,10 @@ def _extract_from_text(pdf_path: str, strict: bool, max_pages: int) -> Tuple[Opt
             full_text += page.get_text()
         doc.close()
         isbn = find_isbn_in_text(full_text, strict=strict)
-        return isbn, 'text'
+        return isbn, "text"
     except Exception as e:
         logger.error("Ошибка при извлечении текста из %s: %s", pdf_path, e)
-        return None, 'text'
+        return None, "text"
 
 
 def _extract_from_metadata(pdf_path: str, strict: bool) -> Tuple[Optional[str], str]:
@@ -120,14 +125,14 @@ def _extract_from_metadata(pdf_path: str, strict: bool) -> Tuple[Optional[str], 
                 text_parts.append(value)
 
         if not text_parts:
-            return None, 'metadata'
+            return None, "metadata"
 
-        combined_text = ' '.join(text_parts)
+        combined_text = " ".join(text_parts)
         isbn = find_isbn_in_text(combined_text, strict=strict)
-        return isbn, 'metadata'
+        return isbn, "metadata"
     except Exception as e:
         logger.error("Ошибка при чтении метаданных %s: %s", pdf_path, e)
-        return None, 'metadata'
+        return None, "metadata"
 
 
 # ---------- Основная функция для вызова извне ----------
@@ -135,7 +140,7 @@ def extract_isbn_from_pdf(
     pdf_path: str,
     strict: bool = True,
     include_metadata: bool = False,
-    max_pages: int = 10
+    max_pages: int = 10,
 ) -> Tuple[Optional[str], Optional[str]]:
     """
     Извлекает ISBN из PDF-файла.
@@ -151,7 +156,7 @@ def extract_isbn_from_pdf(
         Источник: 'text' или 'metadata'.
     """
     if max_pages <= 0:
-        max_pages = float('inf')  # обработать все страницы
+        max_pages = float("inf")  # обработать все страницы
 
     if include_metadata:
         isbn, source = _extract_from_metadata(pdf_path, strict)
@@ -175,7 +180,7 @@ async def find_pdf_files(root_dir: str) -> List[str]:
         nonlocal pdf_files
         for dirpath, _, filenames in os.walk(root_dir):
             for f in filenames:
-                if f.lower().endswith('.pdf'):
+                if f.lower().endswith(".pdf"):
                     full_path = os.path.join(dirpath, f)
                     pdf_files.append(full_path)
 
@@ -230,7 +235,7 @@ async def scan_pdfs(
         extract_isbn_from_pdf,
         strict=strict,
         include_metadata=include_metadata,
-        max_pages=max_pages
+        max_pages=max_pages,
     )
 
     async def process_one(pdf_path: str) -> Tuple[str, Optional[str], Optional[str]]:
@@ -252,22 +257,42 @@ async def scan_pdfs(
 def main():
     parser = argparse.ArgumentParser(description="Извлечение ISBN из PDF-файлов")
     parser.add_argument("directory", help="Корневая директория для поиска")
-    parser.add_argument("--workers", type=int, default=None,
-                        help="Количество параллельных процессов (по умолчанию число ядер CPU)")
-    parser.add_argument("--loose", action="store_true",
-                        help="Не требовать префикса 'ISBN' (может давать ложные срабатывания)")
-    parser.add_argument("--include-metadata", action="store_true",
-                        help="Дополнительно проверять метаданные")
-    parser.add_argument("--max-pages", type=int, default=10,
-                        help="Максимальное число страниц для анализа (0 = все страницы)")
-    parser.add_argument("--max-concurrent", type=int, default=None,
-                        help="Макс. число одновременно обрабатываемых PDF (семафор). По умолчанию = --workers или число ядер CPU")
-    parser.add_argument("--verbose", "-v", action="store_true", help="Подробное логирование")
+    parser.add_argument(
+        "--workers",
+        type=int,
+        default=None,
+        help="Количество параллельных процессов (по умолчанию число ядер CPU)",
+    )
+    parser.add_argument(
+        "--loose",
+        action="store_true",
+        help="Не требовать префикса 'ISBN' (может давать ложные срабатывания)",
+    )
+    parser.add_argument(
+        "--include-metadata",
+        action="store_true",
+        help="Дополнительно проверять метаданные",
+    )
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=10,
+        help="Максимальное число страниц для анализа (0 = все страницы)",
+    )
+    parser.add_argument(
+        "--max-concurrent",
+        type=int,
+        default=None,
+        help="Макс. число одновременно обрабатываемых PDF (семафор). По умолчанию = --workers или число ядер CPU",
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Подробное логирование"
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
     strict = not args.loose
@@ -289,5 +314,5 @@ def main():
     asyncio.run(run())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
