@@ -13,6 +13,7 @@
 """
 
 import sys
+import time
 import argparse
 from typing import Optional
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -110,20 +111,47 @@ def parse_arguments(
 def get_test_data_to_parse() -> dict[str, list[tuple[str, str]]]:
     """Возвращает тестовый набор данных (URL -> список пар label-value)."""
     return {
-        "https://book.ru/book/943665": [
-            {'label':'Год издания:', 'value': '2022'},
-            {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
-            {'label':'Объем:', 'value': '455 стр.'},
+        "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
+            {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
+            {'label':'Год издания', 'value': '2025'},
+            {'label':'', 'value': 'Алексей Васильев'}, 
+            {'label':'Количество страниц', 'value': '616'},
         ],
+        # "https://book.ru/book/943665": [
+        #     {'label':'', 'value': 'Математика на Python'},
+        #     {'label':'Год издания:', 'value': '2022'},
+        #     {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
+        #     {'label':'Объем:', 'value': '455 стр.'}
+        # ],
     }
     
 def get_test_data_to_search() -> dict[str, list[tuple[str, str]]]:
     """Возвращает тестовый набор данных (URL -> список пар label-value)."""
     return {
-        "https://book.ru/book/962004":
-            [{'label':'Год издания:', 'value': '2026'},
-             {'label':'Авторы:', 'value': 'Паршинцева Л.С., Паршинцев А.А.'},
-             {'label':'Объем:', 'value': '129 стр.'}],
+        "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
+            {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
+            {'label':'Год издания', 'value': '2025'},
+            {'label':'', 'value': 'Алексей Васильев'}, 
+            {'label':'Количество страниц', 'value': '616'},
+        ],
+        # "https://book.ru/book/943665": [
+        #     {'label':'', 'value': 'Математика на Python'},
+        #     {'label':'Год издания:', 'value': '2022'},
+        #     {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
+        #     {'label':'Объем:', 'value': '455 стр.'}
+        # ],
+        # "https://book.ru/book/962004": [
+        #      {'label':'', 'value': 'Многомерный анализ данных на Python'},
+        #      {'label':'Год издания:', 'value': '2026'},
+        #      {'label':'Авторы:', 'value': 'Паршинцева Л.С., Паршинцев А.А.'},
+        #      {'label':'Объем:', 'value': '129 стр.'}
+        # ],
+        # "https://book.ru/book/960946": [
+        #     {'label':'', 'value': 'Практикум изучения языка программирования PYTHON. Начальный уровень'},
+        #     {'label':'Год издания:', 'value': '2026'},
+        #     {'label':'Авторы:', 'value': 'Щербаков А.Г.'},
+        #     {'label':'Объем:', 'value': '116 стр.'}
+        # ],
     }
 
 
@@ -164,6 +192,7 @@ def search_web(
             created_driver = create_driver(headless=False)
             driver_or_url = created_driver
             driver_or_url.get(url)
+            time.sleep(5)
         func = extract_common_parent_from_driver
     else:
         # Если is_driver=False, игнорируем переданный driver (он не должен быть передан)
@@ -201,15 +230,26 @@ def generate_pattern(
     
     patterns = []
     
+    def get_deepest_node(nodes):
+        if not nodes:
+            return None
+        def depth(node):
+            d = 0
+            while node is not None:
+                node = node.parent
+                d += 1
+            return d
+        return max(nodes, key=depth)
+    
     for parse_frag in parse_frags:
-        print(f"\n=== Фрагмент для генерации паттерна ===")
+        print("\n=== Фрагмент для генерации паттерна ===")
         print(parse_frag)
         print("=" * 50)
     
         label_text: str= parse_frag[1] # label
         value_text: str= parse_frag[2] # value
     
-        soup = BeautifulSoup(parse_frag[3][0], "lxml") # html фрагмент
+        soup = BeautifulSoup(parse_frag[-1][0], "lxml") # html фрагмент
     
         # Находим узлы label и value
         if search_mode == "text":
@@ -219,15 +259,50 @@ def generate_pattern(
             label_nodes = find_elements_by_text(soup, label_text, exact=exact_label, case_sensitive=case_sensitive)
             value_nodes = find_elements_by_text(soup, value_text, exact=exact_value, case_sensitive=case_sensitive)
     
-        if not label_nodes or not value_nodes:
-            raise ValueError("Не удалось найти label или value во фрагменте")
-    
-        # Берём первые попавшиеся узлы (в фрагменте должна быть одна пара)
-        label_node = label_nodes[0]
-        value_node = value_nodes[0]
-    
-        # Находим общего предка (должен быть переданный фрагмент, но вычислим для надёжности)
-        ancestor = lowest_common_ancestor(label_node, value_node)
+        # Обработка пустого label
+        if label_text == "":
+            # label не задан, игнорируем label_nodes
+            label_node = None
+            if not value_nodes:
+                raise ValueError("Не удалось найти value во фрагменте")
+            value_node = get_deepest_node(value_nodes)
+            # Определяем элемент значения (тег)
+            value_element = value_node if isinstance(value_node, Tag) else value_node.parent
+            # Используем value_element в качестве ancestor (ближайший тег)
+            ancestor = value_element
+            # Попробуем подняться к родителю, если текущий ancestor не имеет отличительных признаков
+            while ancestor is not None and isinstance(ancestor, Tag):
+                has_id = ancestor.has_attr('id')
+                has_class = ancestor.has_attr('class')
+                if has_id or has_class:
+                    break
+                parent = ancestor.parent
+                if parent is None or not isinstance(parent, Tag) or parent.name in ('body', 'html', '[document]'):
+                    break
+                ancestor = parent
+            # Если ancestor всё ещё слишком высокий, попробуем найти более подходящего предка
+            while ancestor is not None and isinstance(ancestor, Tag) and ancestor.name in ('body', 'html', '[document]'):
+                if ancestor.parent is not None:
+                    ancestor = ancestor.parent
+                else:
+                    break
+        else:
+            if not label_nodes or not value_nodes:
+                raise ValueError("Не удалось найти label или value во фрагменте")
+            label_node = get_deepest_node(label_nodes)
+            value_node = get_deepest_node(value_nodes)
+            ancestor = lowest_common_ancestor(label_node, value_node)
+
+        # Отладочная информация
+        if args.verbose:
+            print(f"[DEBUG generate_pattern] label_text={label_text!r}, value_text={value_text!r}")
+            print(f"[DEBUG generate_pattern] value_node type={type(value_node)}, value_node={value_node}")
+            print(f"[DEBUG generate_pattern] ancestor type={type(ancestor)}, ancestor={ancestor}")
+            if hasattr(value_node, 'name'):
+                print(f"[DEBUG generate_pattern] value_node.name={value_node.name}")
+            if isinstance(ancestor, Tag):
+                print(f"[DEBUG generate_pattern] ancestor.name={ancestor.name}")
+        
         if ancestor is None:
             raise ValueError("Не удалось найти общего предка для label и value")
     
@@ -249,6 +324,8 @@ def generate_pattern(
             # Если есть уникальный класс (в пределах фрагмента)
             if element.has_attr("class"):
                 classes = element["class"]
+                if isinstance(classes, str):
+                    classes = classes.split()
                 if isinstance(classes, list):
                     for cls in classes:
                         # Проверяем, что этот класс встречается только у данного элемента в soup
@@ -281,12 +358,16 @@ def generate_pattern(
             value_classes = []
             if isinstance(value_element, Tag) and value_element.has_attr("class"):
                 classes = value_element["class"]
+                if isinstance(classes, str):
+                    classes = classes.split()
                 if isinstance(classes, list):
                     value_classes = classes
             # Собираем классы предка
             ancestor_classes = []
             if ancestor.has_attr("class"):
                 classes = ancestor["class"]
+                if isinstance(classes, str):
+                    classes = classes.split()
                 if isinstance(classes, list):
                     ancestor_classes = classes
             
@@ -308,7 +389,10 @@ def generate_pattern(
                 if ancestor_classes:
                     ancestor_class_part = f"[contains(@class, '{ancestor_classes[0]}')]"
                 value_tag = value_element.name if isinstance(value_element, Tag) else "*"
-                xpath = f"//*{ancestor_class_part}[.//*[contains(text(), '{label_text}')]]//{value_tag}"
+                if label_text:
+                    xpath = f"//*{ancestor_class_part}[.//*[contains(text(), '{label_text}')]]//{value_tag}"
+                else:
+                    xpath = f"//*{ancestor_class_part}//{value_tag}"
             
             pattern = {
                 "type": "xpath",
@@ -430,7 +514,7 @@ def print_fragments(fragments: list[tuple]) -> None:
         print("=" * 50)
 
 
-def run_parse(args: argparse.Namespace) -> Union[bool, list[str]]:
+def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
     """
     Выполняет поиск фрагментов на основе аргументов.
     Возвращает True, если хотя бы один фрагмент найден, иначе False.
@@ -444,7 +528,10 @@ def run_parse(args: argparse.Namespace) -> Union[bool, list[str]]:
         }
 
     all_fragments = []
-    driver = create_driver(headless=False) if args.selenium else None
+    driver_created = False
+    if driver is None and args.selenium:
+        driver = create_driver(headless=False)
+        driver_created = True
     try:
         for url, pairs in search_data.items():
             if args.verbose:
@@ -452,6 +539,7 @@ def run_parse(args: argparse.Namespace) -> Union[bool, list[str]]:
 
             if driver:
                 driver.get(url)
+                time.sleep(5)
 
             
             for pair in pairs:
@@ -473,7 +561,7 @@ def run_parse(args: argparse.Namespace) -> Union[bool, list[str]]:
                 )
                 all_fragments.extend([(url, pair['label'], pair['value'], fragments)])
     finally:
-        if driver:
+        if driver_created and driver:
             driver.quit()
 
     if not all_fragments:
@@ -486,33 +574,56 @@ def run_parse(args: argparse.Namespace) -> Union[bool, list[str]]:
     return all_fragments
 
 
-def run_search(args, patterns) -> list[Optional[str]]:
+def run_search(args, patterns, driver=None) -> list[Optional[str]]:
     search_data = get_test_data_to_search()
     all_extracted = []
     
-    for url, pairs in search_data.items():
-        print(f"\n🔍 Проверка URL: {url} с паттерном '{patterns[0]['type']}'")
-        
-        for pair in pairs:
-            print(f"\n=== Поиск пары: '{pair['label']}' – '{pair['value']}' ===")
-            
-            search_frags = extract_common_parent_from_url(
-                                    url=url,
-                                    label_text=pair['label'],  # label
-                                    value_text=pair['value'],  # value
-                                    exact_label=args.exact,
-                                    exact_value=args.exact,
-                                    case_sensitive=args.case_sensitive,
-                                    all_matches=args.all_matches,
-                                    verbose=args.verbose,
-                                    search_mode=args.search_mode,
-                                )
-            
-            extracted = extract_value(search_frags[0], patterns[0])
-            
-            print(f"Извлечённое значение: {extracted}")
+    # Создаём драйвер один раз, если используется Selenium
+    driver_created = False
+    if driver is None and args.selenium:
+        driver = create_driver(headless=False)
+        driver_created = True
     
-            all_extracted.append(extracted)
+    try:
+        for url, pairs in search_data.items():
+            print(f"\n🔍 Проверка URL: {url} с паттерном '{patterns[0]['type']}'")
+            
+            if driver:
+                driver.get(url)
+                time.sleep(5)
+            
+            for idx, pair in enumerate(pairs):
+                # Выбираем соответствующий паттерн, если есть, иначе первый
+                pattern = patterns[idx] if idx < len(patterns) else patterns[0]
+                print(f"\n=== Поиск пары: '{pair['label']}' – '{pair['value']}' ===")
+                print(f"[DEBUG] Используется паттерн: {pattern['type']} -> {pattern['selector']}")
+                
+                search_frags = search_web(
+                    url=url,
+                    is_driver=args.selenium,
+                    label=pair['label'],
+                    value=pair['value'],
+                    exact_label=args.exact,
+                    exact_value=args.exact,
+                    case_sensitive=args.case_sensitive,
+                    all_matches=args.all_matches,
+                    verbose=args.verbose,
+                    search_mode=args.search_mode,
+                    driver=driver,
+                )
+                
+                if not search_frags:
+                    print("[WARN] Фрагменты не найдены, пропускаем")
+                    extracted = None
+                else:
+                    extracted = extract_value(search_frags[0], pattern)
+                
+                print(f"Извлечённое значение: {extracted}")
+        
+                all_extracted.append(extracted)
+    finally:
+        if driver_created and driver is not None:
+            driver.quit()
     
     return all_extracted
     
@@ -521,7 +632,7 @@ def main() -> None:
         "url": r"https://book.ru/book/943665",
         "label": "Год издания:",
         "value": "2022",
-        "selenium": False,
+        "selenium": True,
         "exact": True,
         "verbose": True,
         "test": True,
@@ -529,22 +640,26 @@ def main() -> None:
         "all_matches": True,
     }
     args = parse_arguments(**default_arg_values)
-    
-    parse_frags = run_parse(args)
-    if not parse_frags:
-        print("   ❌ Фрагменты не найдены.")
-        sys.exit(1)
-        
-    patterns = generate_pattern(
-        parse_frags,
-        args = args
-    )
 
-    # for pattern in patterns:
-    #     print(f"   Тип паттерна: {pattern['type']}")
-    #     print(f"   Селектор: {pattern['selector']}")
-    
-    values = run_search(args, patterns)
+    driver = None
+    if args.selenium:
+        driver = create_driver(headless=False)
+
+    try:
+        parse_frags = run_parse(args, driver=driver)
+        if not parse_frags:
+            print("   ❌ Фрагменты не найдены.")
+            sys.exit(1)
+            
+        patterns = generate_pattern(
+            parse_frags,
+            args = args
+        )
+        
+        run_search(args, patterns, driver=driver)
+    finally:
+        if driver is not None:
+            driver.quit()
 
 if __name__ == "__main__":
     main()

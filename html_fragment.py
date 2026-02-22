@@ -14,7 +14,19 @@ import requests
 import re
 from selenium.webdriver.remote.webdriver import WebDriver
 
-
+DEFAULT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Cache-Control": "max-age=0",
+}
 
 def find_elements_by_text(
     soup: BeautifulSoup,
@@ -25,6 +37,9 @@ def find_elements_by_text(
     """
     Находит все элементы (теги), чей полный текст (`.get_text()`) содержит заданный текст.
     """
+    if text is None or text == "":
+        return []
+
     def match(s: str) -> bool:
         target = s if case_sensitive else s.lower()
         needle = text if case_sensitive else text.lower()
@@ -53,7 +68,12 @@ def find_text_nodes(
     """
     Находит все текстовые узлы (NavigableString), содержащие заданный текст.
     """
+    if text is None or text == "":
+        return []
+
     def match(s: str) -> bool:
+        if text is None:
+            return False
         target = s if case_sensitive else s.lower()
         needle = text if case_sensitive else text.lower()
         if exact:
@@ -156,11 +176,48 @@ def extract_common_parent_html(
                 sample = sample.get_text(strip=True)[:100]
             print(f"[DEBUG] Пример value узла: '{sample}'")
 
-    if not label_nodes or not value_nodes:
+    # Проверка наличия value_nodes
+    if not value_nodes:
         if verbose:
-            print("[DEBUG] Не найдены label или value узлы, возвращаем пустой список.")
+            print("[DEBUG] Не найдены value узлы, возвращаем пустой список.")
+        return []
+    # Если label_text не пустой, но label_nodes отсутствуют — тоже возвращаем пустой список
+    if label_text and not label_nodes:
+        if verbose:
+            print("[DEBUG] Не найдены label узлы (при непустом label), возвращаем пустой список.")
         return []
 
+    # Обработка случая, когда метка отсутствует (пустой label_text)
+    if label_text == "":
+        # Игнорируем label_nodes, обрабатываем только value_nodes
+        unique_ancestors = set()
+        fragments = []
+        for val in value_nodes:
+            # Используем самого узла значения в качестве обоих узлов для LCA
+            ancestor = lowest_common_ancestor(val, val)
+            if ancestor is None:
+                continue
+            # Пропустить слишком высокие предки (body, html, document)
+            if ancestor.name in ('body', 'html', '[document]'):
+                if verbose:
+                    print(f"[DEBUG] Пропущен предок с тегом {ancestor.name}")
+                continue
+            ancestor_id = id(ancestor)
+            if ancestor_id in unique_ancestors:
+                if verbose:
+                    print(f"[DEBUG] Пропущен дубликат предка {ancestor.name}")
+                continue
+            unique_ancestors.add(ancestor_id)
+            fragments.append(str(ancestor))
+            if verbose:
+                print(f"[DEBUG] Добавлен фрагмент с тегом {ancestor.name}")
+            if not all_matches:
+                return fragments
+        if verbose:
+            print(f"[DEBUG] Всего найдено уникальных фрагментов: {len(fragments)}")
+        return fragments
+
+    # Обычная обработка с парой label-value
     unique_ancestors = set()
     fragments = []
     pair_index = 0
@@ -226,7 +283,16 @@ def extract_common_parent_from_url(
             )
         html = driver.page_source
     else:
-        response = requests.get(url, **request_kwargs)
+        # Добавляем заголовки по умолчанию, если не переданы свои
+        kwargs = dict(request_kwargs)
+        if 'headers' not in kwargs:
+            kwargs['headers'] = DEFAULT_HEADERS
+        else:
+            # Объединяем переданные заголовки с default, приоритет у переданных
+            merged_headers = DEFAULT_HEADERS.copy()
+            merged_headers.update(kwargs['headers'])
+            kwargs['headers'] = merged_headers
+        response = requests.get(url, **kwargs)
         response.raise_for_status()
         html = response.text
 
