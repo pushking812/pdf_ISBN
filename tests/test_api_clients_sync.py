@@ -5,6 +5,7 @@ from api_clients import (
     get_from_rsl
 )
 
+pytestmark = [pytest.mark.network]
 
 SYNC_CLIENTS = [
     ("Google Books", get_from_google_books),

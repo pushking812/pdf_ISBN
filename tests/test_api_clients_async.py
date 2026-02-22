@@ -5,6 +5,7 @@ from api_clients import (
     get_from_rsl_async
 )
 
+pytestmark = [pytest.mark.network]
 
 ASYNC_CLIENTS = [
     ("Google Books async", get_from_google_books_async),

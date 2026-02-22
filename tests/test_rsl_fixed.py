@@ -1,34 +1,23 @@
-import sys
-sys.path.insert(0, '.')
-from api_clients import get_from_rsl
-
-result = get_from_rsl('9785977520966')
-print("Результат запроса к RSL:")
-if result:
-    print(f"Название: {result['title']}")
-    print(f"Авторы: {result['authors']}")
-    print(f"Год: {result['year']}")
-    print(f"Страницы: {result['pages']}")
-    print(f"Источник: {result['source']}")
-else:
-    print("Не удалось получить данные (None)")
-
-# Также проверим асинхронную версию
-import asyncio
+import pytest
+from api_clients import get_from_rsl, get_from_rsl_async
 import aiohttp
-from api_clients import get_from_rsl_async
 
-async def test_async():
+
+@pytest.mark.network
+def test_get_from_rsl_sync_returns_data_for_known_isbn():
+    """Проверка синхронного клиента РГБ на известном ISBN."""
+    result = get_from_rsl('9785977520966')
+    if result is None:
+        pytest.skip("RSL sync: не удалось получить данные (None)")
+    assert 'title' in result and result['title']
+
+
+@pytest.mark.network
+@pytest.mark.asyncio
+async def test_get_from_rsl_async_returns_data_for_known_isbn():
+    """Проверка асинхронного клиента РГБ на известном ISBN."""
     async with aiohttp.ClientSession() as session:
         result = await get_from_rsl_async(session, '9785977520966')
-        print("\nАсинхронный результат:")
-        if result:
-            print(f"Название: {result['title']}")
-            print(f"Авторы: {result['authors']}")
-            print(f"Год: {result['year']}")
-            print(f"Страницы: {result['pages']}")
-            print(f"Источник: {result['source']}")
-        else:
-            print("Не удалось получить данные (None)")
-
-asyncio.run(test_async())
+    if result is None:
+        pytest.skip("RSL async: не удалось получить данные (None)")
+    assert 'title' in result and result['title']

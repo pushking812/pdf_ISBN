@@ -27,6 +27,8 @@ from html_fragment import (
 )
 from bs4 import BeautifulSoup, Tag
 from typing import Dict, Any, Union
+from resources import get_resource_by_url
+from config import ScraperConfig
 
 
 def parse_arguments(
@@ -111,35 +113,47 @@ def parse_arguments(
 def get_test_data_to_parse() -> dict[str, list[tuple[str, str]]]:
     """Возвращает тестовый набор данных (URL -> список пар label-value)."""
     return {
-        "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
-            {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
-            {'label':'Год издания', 'value': '2025'},
-            {'label':'', 'value': 'Алексей Васильев'}, 
-            {'label':'Количество страниц', 'value': '616'},
+        "https://search.rsl.ru/ru/record/01010115385": [
+            {'label':'Автор', 'value': 'МакГрат, Майк'},
+            {'label':'Заглавие', 'value': 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+'},
+            {'label':'Выходные данные', 'value': 'Москва : Эксмо, 2019'},
+            {'label':'Физическое описание', 'value': '192 с. : ил.; 26 см'},
         ],
-        "https://book.ru/book/943665": [
-            {'label':'', 'value': 'Математика на Python'},
-            {'label':'Год издания:', 'value': '2022'},
-            {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
-            {'label':'Объем:', 'value': '455 стр.'}
-        ],
+        # "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
+        #     {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
+        #     {'label':'Год издания', 'value': '2025'},
+        #     {'label':'', 'value': 'Алексей Васильев'}, 
+        #     {'label':'Количество страниц', 'value': '616'},
+        # ],
+        # "https://book.ru/book/943665": [
+        #     {'label':'', 'value': 'Математика на Python'},
+        #     {'label':'Год издания:', 'value': '2022'},
+        #     {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
+        #     {'label':'Объем:', 'value': '455 стр.'}
+        # ],
     }
     
 def get_test_data_to_search() -> dict[str, list[tuple[str, str]]]:
     """Возвращает тестовый набор данных (URL -> список пар label-value)."""
     return {
-        "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
-            {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
-            {'label':'Год издания', 'value': '2025'},
-            {'label':'', 'value': 'Алексей Васильев'}, 
-            {'label':'Количество страниц', 'value': '616'},
+        "https://search.rsl.ru/ru/record/01010115385": [
+            {'label':'Автор', 'value': 'МакГрат, Майк'},
+            {'label':'Заглавие', 'value': 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+'},
+            {'label':'Выходные данные', 'value': 'Москва : Эксмо, 2019'},
+            {'label':'Физическое описание', 'value': '192 с. : ил.; 26 см'},
         ],
-        "https://book.ru/book/943665": [
-            {'label':'', 'value': 'Математика на Python'},
-            {'label':'Год издания:', 'value': '2022'},
-            {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
-            {'label':'Объем:', 'value': '455 стр.'}
-        ],
+        # "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
+        #     {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
+        #     {'label':'Год издания', 'value': '2025'},
+        #     {'label':'', 'value': 'Алексей Васильев'}, 
+        #     {'label':'Количество страниц', 'value': '616'},
+        # ],
+        # "https://book.ru/book/943665": [
+        #     {'label':'', 'value': 'Математика на Python'},
+        #     {'label':'Год издания:', 'value': '2022'},
+        #     {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
+        #     {'label':'Объем:', 'value': '455 стр.'}
+        # ],
         # "https://book.ru/book/962004": [
         #      {'label':'', 'value': 'Многомерный анализ данных на Python'},
         #      {'label':'Год издания:', 'value': '2026'},
@@ -287,11 +301,16 @@ def generate_pattern(
         print("\n=== Фрагмент для генерации паттерна ===")
         print(parse_frag)
         print("=" * 50)
+        
+        # Определяем структуру кортежа (старая vs новая)
+        if len(parse_frag) == 5:
+            url, label_text, value_text, fragments, resource = parse_frag
+        else:
+            # старая версия (4 элемента)
+            url, label_text, value_text, fragments = parse_frag
+            resource = None
     
-        label_text: str= parse_frag[1] # label
-        value_text: str= parse_frag[2] # value
-    
-        soup = BeautifulSoup(parse_frag[-1][0], "lxml") # html фрагмент
+        soup = BeautifulSoup(fragments[0], "lxml") # html фрагмент
     
         # Находим узлы label и value
         if search_mode == "text":
@@ -395,6 +414,7 @@ def generate_pattern(
                 "label_text": label_text,
                 "value_text": value_text,
                 "clean_regex": None,
+                "resource_id": resource.get("id") if resource else None,
             }
         else:
             # Генерируем XPath с использованием классов и структуры
@@ -446,6 +466,7 @@ def generate_pattern(
                 "label_text": label_text,
                 "value_text": value_text,
                 "clean_regex": None,
+                "resource_id": resource.get("id") if resource else None,
             }
             
         print(f"Сгенерирован паттерн: {pattern['type']} -> {pattern['selector']} (атрибут: {pattern['attribute']})")
@@ -606,7 +627,9 @@ def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
                     search_mode=args.search_mode,
                     driver=driver,
                 )
-                all_fragments.extend([(url, pair['label'], pair['value'], fragments)])
+                config = ScraperConfig()
+                resource = get_resource_by_url(url, config)
+                all_fragments.extend([(url, pair['label'], pair['value'], fragments, resource)])
     finally:
         if driver_created and driver:
             driver.quit()
@@ -631,25 +654,58 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
         driver = create_driver(headless=False)
         driver_created = True
     
-    pattern_index = 0
+    # Группируем паттерны по resource_id для быстрого поиска
+    patterns_by_resource = {}
+    patterns_without_resource = []
+    for pat in patterns:
+        resource_id = pat.get("resource_id")
+        if resource_id:
+            patterns_by_resource.setdefault(resource_id, []).append(pat)
+        else:
+            patterns_without_resource.append(pat)
+    
+    # Конфиг для определения ресурса по URL
+    config = ScraperConfig()
+    
     try:
         for url, pairs in search_data.items():
-            print(f"\n🔍 Проверка URL: {url} с паттерном '{patterns[0]['type']}'")
+            # Определяем ресурс по URL
+            resource = get_resource_by_url(url, config)
+            resource_id = resource.get("id") if resource else None
+            
+            # Получаем список паттернов для данного ресурса
+            resource_patterns = []
+            if resource_id and resource_id in patterns_by_resource:
+                resource_patterns = patterns_by_resource[resource_id]
+            elif patterns_without_resource:
+                resource_patterns = patterns_without_resource
+            elif patterns:
+                resource_patterns = patterns
+            else:
+                print("[ERROR] Нет доступных паттернов")
+            
+            print(f"\n🔍 Проверка URL: {url} (ресурс: {resource_id})")
+            print(f"   Доступно паттернов для ресурса: {len(resource_patterns)}")
             
             if driver:
                 driver.get(url)
                 time.sleep(5)
             
             for idx, pair in enumerate(pairs):
-                # Выбираем паттерн по порядку среди всех сгенерированных
-                if pattern_index >= len(patterns):
-                    print(f"[ERROR] Недостаточно паттернов (index {pattern_index})")
-                    pattern = patterns[0]
-                else:
-                    pattern = patterns[pattern_index]
                 print(f"\n=== Поиск пары: '{pair['label']}' – '{pair['value']}' ===")
-                print(f"[DEBUG] Используется паттерн: {pattern['type']} -> {pattern['selector']}")
-                pattern_index += 1
+                
+                # Выбираем паттерн по порядку (если хватает)
+                pattern = None
+                if resource_patterns:
+                    pattern_idx = idx if idx < len(resource_patterns) else -1
+                    pattern = resource_patterns[pattern_idx]
+                else:
+                    pattern = None
+                
+                if pattern:
+                    print(f"[DEBUG] Используется паттерн: {pattern['type']} -> {pattern['selector']}")
+                else:
+                    print("[WARN] Не удалось выбрать паттерн для извлечения")
                 
                 search_frags = search_web(
                     url=url,
@@ -667,9 +723,28 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                 
                 if not search_frags:
                     print("[WARN] Фрагменты не найдены, пропускаем")
-                    extracted = None
-                else:
+                    # Пытаемся извлечь значение напрямую по паттерну, если он есть
+                    if pattern:
+                        if driver is not None:
+                            extracted = extract_value(driver, pattern)
+                        else:
+                            # Загружаем HTML через requests
+                            import requests
+                            from requests.exceptions import RequestException
+                            try:
+                                resp = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
+                                resp.raise_for_status()
+                                extracted = extract_value(resp.text, pattern)
+                            except RequestException as e:
+                                print(f"[ERROR] Не удалось загрузить страницу: {e}")
+                                extracted = None
+                    else:
+                        extracted = None
+                elif pattern:
                     extracted = extract_value(search_frags[0], pattern)
+                else:
+                    extracted = None
+                    print("[ERROR] Не удалось выбрать паттерн для извлечения")
                 
                 print(f"Извлечённое значение: {extracted}")
         
@@ -685,9 +760,9 @@ def main() -> None:
         "url": r"https://book.ru/book/943665",
         "label": "Год издания:",
         "value": "2022",
-        "selenium": True,
+        "selenium": False,
         "exact": True,
-        "verbose": True,
+        "verbose": False,
         "test": True,
         "search_mode": "element",
         "all_matches": True,

@@ -1,4 +1,5 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+from urllib.parse import urlparse
 from config import ScraperConfig
 
 
@@ -319,3 +320,34 @@ def get_scraper_resources(config: ScraperConfig) -> List[Dict[str, Any]]:
         _book_ru_resource(),
         _rsl_resource(),
     ]
+
+
+def get_resource_by_url(url: str, config: ScraperConfig = None) -> Optional[Dict[str, Any]]:
+    """
+    Возвращает ресурс (словарь с селекторами), соответствующий переданному URL.
+    Если конфиг не передан, создаётся конфиг по умолчанию.
+    """
+    from urllib.parse import urlparse
+    
+    if config is None:
+        from config import ScraperConfig
+        config = ScraperConfig()
+    
+    resources = get_scraper_resources(config)
+    parsed_url = urlparse(url)
+    url_domain = parsed_url.netloc.lower()
+    
+    for resource in resources:
+        resource_url = resource.get("base_url")
+        if not resource_url:
+            continue
+        parsed_resource = urlparse(resource_url)
+        resource_domain = parsed_resource.netloc.lower()
+        # Сравниваем домены (можно также учитывать поддомены)
+        if url_domain == resource_domain or url_domain.endswith('.' + resource_domain):
+            return resource
+        # Дополнительно проверяем, содержит ли URL базовый URL (для учёта пути)
+        if url.startswith(resource_url):
+            return resource
+    
+    return None
