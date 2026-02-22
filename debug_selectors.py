@@ -15,8 +15,12 @@
 import sys
 import time
 import argparse
+import random
 from typing import Optional
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 from html_fragment import (
     extract_common_parent_from_url,
@@ -123,16 +127,16 @@ def get_test_data_to_parse() -> dict[str, list[dict[str, str]]]:
             {"label": "Физическое описание", "value": "192 с. : ил.; 26 см"},
         ],
         "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
-            {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
-            {'label':'Год издания', 'value': '2025'},
-            {'label':'Автор', 'value': 'Алексей Васильев'},
-            {'label':'Количество страниц', 'value': '616'},
+            {"label": "", "value": "Программирование на Python в примерах и задачах"},
+            {"label": "Год издания", "value": "2025"},
+            {"label": "", "value": "Алексей Васильев"},
+            {"label": "Количество страниц", "value": "616"},
         ],
         "https://book.ru/book/943665": [
-            {'label':'', 'value': 'Математика на Python'},
-            {'label':'Год издания:', 'value': '2022'},
-            {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
-            {'label':'Объем:', 'value': '455 стр.'}
+            {"label": "", "value": "Математика на Python"},
+            {"label": "Год издания:", "value": "2022"},
+            {"label": "Авторы:", "value": "Криволапов С.Я., Хрипунова М.Б."},
+            {"label": "Объем:", "value": "455 стр."},
         ],
     }
 
@@ -150,28 +154,31 @@ def get_test_data_to_search() -> dict[str, list[dict[str, str]]]:
             {"label": "Физическое описание", "value": "192 с. : ил.; 26 см"},
         ],
         "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
-            {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
-            {'label':'Год издания', 'value': '2025'},
-            {'label':'', 'value': 'Алексей Васильев'},
-            {'label':'Количество страниц', 'value': '616'},
+            {"label": "", "value": "Программирование на Python в примерах и задачах"},
+            {"label": "Год издания", "value": "2025"},
+            {"label": "", "value": "Алексей Васильев"},
+            {"label": "Количество страниц", "value": "616"},
         ],
         "https://book.ru/book/943665": [
-            {'label':'', 'value': 'Математика на Python'},
-            {'label':'Год издания:', 'value': '2022'},
-            {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
-            {'label':'Объем:', 'value': '455 стр.'}
+            {"label": "", "value": "Математика на Python"},
+            {"label": "Год издания:", "value": "2022"},
+            {"label": "Авторы:", "value": "Криволапов С.Я., Хрипунова М.Б."},
+            {"label": "Объем:", "value": "455 стр."},
         ],
         "https://book.ru/book/962004": [
-             {'label':'', 'value': 'Многомерный анализ данных на Python'},
-             {'label':'Год издания:', 'value': '2026'},
-             {'label':'Авторы:', 'value': 'Паршинцева Л.С., Паршинцев А.А.'},
-             {'label':'Объем:', 'value': '129 стр.'}
+            {"label": "", "value": "Многомерный анализ данных на Python"},
+            {"label": "Год издания:", "value": "2026"},
+            {"label": "Авторы:", "value": "Паршинцева Л.С., Паршинцев А.А."},
+            {"label": "Объем:", "value": "129 стр."},
         ],
         "https://book.ru/book/960946": [
-            {'label':'', 'value': 'Практикум изучения языка программирования PYTHON. Начальный уровень'},
-            {'label':'Год издания:', 'value': '2026'},
-            {'label':'Авторы:', 'value': 'Щербаков А.Г.'},
-            {'label':'Объем:', 'value': '116 стр.'}
+            {
+                "label": "",
+                "value": "Практикум изучения языка программирования PYTHON. Начальный уровень",
+            },
+            {"label": "Год издания:", "value": "2026"},
+            {"label": "Авторы:", "value": "Щербаков А.Г."},
+            {"label": "Объем:", "value": "116 стр."},
         ],
     }
 
@@ -183,6 +190,32 @@ def create_driver(headless: bool = False) -> WebDriver:
 
     config = ScraperConfig(headless=headless)
     return create_chrome_driver(config)
+
+
+def wait_for_page_with_protection(
+    driver: WebDriver, timeout: int = 10, min_delay: float = 1.0, max_delay: float = 3.0
+) -> None:
+    """
+    Ожидает загрузки страницы с защитой от анти-бот систем.
+
+    Args:
+        driver: WebDriver экземпляр
+        timeout: Максимальное время ожидания появления body (секунды)
+        min_delay: Минимальная случайная задержка после загрузки (секунды)
+        max_delay: Максимальная случайная задержка после загрузки (секунды)
+    """
+    # Ожидание базовой загрузки страницы (появление body)
+    try:
+        WebDriverWait(driver, timeout).until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+    except Exception as e:
+        print(f"[WARN] Timeout ожидания загрузки страницы: {e}")
+
+    # Случайная задержка для обхода защиты ресурсов
+    delay = random.uniform(min_delay, max_delay)
+    if delay > 0:
+        time.sleep(delay)
 
 
 def search_web(
@@ -214,7 +247,7 @@ def search_web(
             created_driver = create_driver(headless=False)
             driver_or_url = created_driver
             driver_or_url.get(url)
-            time.sleep(5)
+            wait_for_page_with_protection(driver_or_url)
         func = extract_common_parent_from_driver
     else:
         # Если is_driver=False, игнорируем переданный driver (он не должен быть передан)
@@ -251,6 +284,39 @@ def generate_pattern(
     case_sensitive: bool = args.case_sensitive
 
     patterns = []
+
+    def build_xpath_text_condition(
+        text: str, exact: bool = False, case_sensitive: bool = False
+    ) -> str:
+        """
+        Строит XPath условие для поиска текста с учётом нормализации пробелов и регистра.
+
+        Args:
+            text: Искомый текст
+            exact: Точное совпадение (True) или частичное (False)
+            case_sensitive: Учитывать регистр (True) или нет (False)
+
+        Returns:
+            XPath условие для использования в contains() или =
+        """
+        # Экранируем кавычки в тексте
+        escaped_text = text.replace("'", "'").replace('"', '"')
+
+        if exact:
+            if case_sensitive:
+                # Точное совпадение с учётом регистра, нормализация пробелов
+                return f"normalize-space(.) = '{escaped_text}'"
+            else:
+                # Точное совпадение без учёта регистра
+                # Используем translate для приведения к нижнему регистру (английские и русские буквы)
+                return f"translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('{escaped_text}', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')"
+        else:
+            if case_sensitive:
+                # Частичное совпадение с учётом регистра
+                return f"contains(., '{escaped_text}')"
+            else:
+                # Частичное совпадение без учёта регистра
+                return f"contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя'), translate('{escaped_text}', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя'))"
 
     def get_deepest_node(nodes):
         if not nodes:
@@ -322,7 +388,9 @@ def generate_pattern(
 
         # Проверяем, что есть хотя бы один фрагмент
         if not fragments:
-            print(f"[WARN] Пропуск фрагмента: label='{label_text}', value='{value_text}' - фрагменты не найдены")
+            print(
+                f"[WARN] Пропуск фрагмента: label='{label_text}', value='{value_text}' - фрагменты не найдены"
+            )
             continue
 
         soup = BeautifulSoup(fragments[0], "lxml")  # html фрагмент
@@ -494,7 +562,10 @@ def generate_pattern(
                             f"[contains(@class, '{ancestor_classes[0]}')]"
                         )
                     # XPath: ancestor с классом, содержащий label с текстом, затем следующий sibling значения
-                    xpath = f"//*{ancestor_class_part}[.//{label_tag}[contains(text(), '{label_text}')]]//{label_tag}[contains(text(), '{label_text}')]/following-sibling::{value_tag}"
+                    label_condition = build_xpath_text_condition(
+                        label_text, exact=exact_label, case_sensitive=case_sensitive
+                    )
+                    xpath = f"//*{ancestor_class_part}[.//{label_tag}[{label_condition}]]//{label_tag}[{label_condition}]/following-sibling::{value_tag}"
                 else:
                     # Стандартный fallback с исключением label (если label задан)
                     ancestor_class_part = ""
@@ -504,7 +575,10 @@ def generate_pattern(
                         )
                     if label_text:
                         # Исключаем элемент, содержащий текст label
-                        xpath = f"//*{ancestor_class_part}[.//*[contains(text(), '{label_text}')]]//{value_tag}[not(contains(text(), '{label_text}'))]"
+                        label_condition = build_xpath_text_condition(
+                            label_text, exact=exact_label, case_sensitive=case_sensitive
+                        )
+                        xpath = f"//*{ancestor_class_part}[.//*[{label_condition}]]//{value_tag}[not({label_condition})]"
                     else:
                         xpath = f"//*{ancestor_class_part}//{value_tag}"
 
@@ -662,7 +736,7 @@ def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
 
             if driver:
                 driver.get(url)
-                time.sleep(5)
+                wait_for_page_with_protection(driver)
 
             for pair in pairs:
                 if args.verbose:
@@ -691,7 +765,9 @@ def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
                     )
                 else:
                     if args.verbose:
-                        print(f"[WARN] Для пары '{pair['label']}' - '{pair['value']}' фрагменты не найдены")
+                        print(
+                            f"[WARN] Для пары '{pair['label']}' - '{pair['value']}' фрагменты не найдены"
+                        )
     finally:
         if driver_created and driver:
             driver.quit()
@@ -721,12 +797,62 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
     # Группируем паттерны по resource_id для быстрого поиска
     patterns_by_resource = {}
     patterns_without_resource = []
+    # Дополнительно создаём маппинг по ключам (resource_id, label, value) для точного соответствия
+    patterns_by_key = {}
+
     for pat in patterns:
         resource_id = pat.get("resource_id")
+        label_text = pat.get("label_text", "")
+        value_text = pat.get("value_text", "")
+
         if resource_id:
             patterns_by_resource.setdefault(resource_id, []).append(pat)
+            # Создаём ключ для точного соответствия
+            key = (resource_id, label_text, value_text)
+            patterns_by_key[key] = pat
         else:
             patterns_without_resource.append(pat)
+            # Для паттернов без resource_id используем только label/value
+            key = (None, label_text, value_text)
+            patterns_by_key[key] = pat
+
+    def find_best_pattern(resource_id, label, value, available_patterns):
+        """
+        Находит наилучший паттерн для заданной пары (label, value) и resource_id.
+
+        Приоритет поиска:
+        1. Точное совпадение по (resource_id, label, value)
+        2. Совпадение по (resource_id, label) (value может отличаться)
+        3. Совпадение по (resource_id) (только resource_id)
+        4. Любой паттерн без resource_id с совпадением label/value
+        5. Первый доступный паттерн
+        """
+        # 1. Точное совпадение
+        exact_key = (resource_id, label, value)
+        if exact_key in patterns_by_key:
+            return patterns_by_key[exact_key]
+
+        # 2. Совпадение по resource_id и label (value любое)
+        if resource_id:
+            for key, pat in patterns_by_key.items():
+                if key[0] == resource_id and key[1] == label:
+                    return pat
+
+        # 3. Совпадение только по resource_id
+        if resource_id and resource_id in patterns_by_resource:
+            # Возвращаем первый паттерн для этого ресурса
+            return patterns_by_resource[resource_id][0]
+
+        # 4. Паттерны без resource_id с совпадением label/value
+        for pat in patterns_without_resource:
+            if pat.get("label_text") == label and pat.get("value_text") == value:
+                return pat
+
+        # 5. Первый доступный паттерн
+        if available_patterns:
+            return available_patterns[0]
+
+        return None
 
     # Конфиг для определения ресурса по URL
     config = ScraperConfig()
@@ -753,22 +879,22 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
 
             if driver:
                 driver.get(url)
-                time.sleep(5)
+                wait_for_page_with_protection(driver)
 
             for idx, pair in enumerate(pairs):
                 print(f"\n=== Поиск пары: '{pair['label']}' – '{pair['value']}' ===")
 
-                # Выбираем паттерн по порядку (если хватает)
-                pattern = None
-                if resource_patterns:
-                    pattern_idx = idx if idx < len(resource_patterns) else -1
-                    pattern = resource_patterns[pattern_idx]
-                else:
-                    pattern = None
+                # Выбираем наилучший паттерн для текущей пары
+                pattern = find_best_pattern(
+                    resource_id, pair["label"], pair["value"], resource_patterns
+                )
 
                 if pattern:
                     print(
                         f"[DEBUG] Используется паттерн: {pattern['type']} -> {pattern['selector']}"
+                    )
+                    print(
+                        f"[DEBUG] Паттерн соответствует: label='{pattern.get('label_text')}', value='{pattern.get('value_text')}'"
                     )
                 else:
                     print("[WARN] Не удалось выбрать паттерн для извлечения")

@@ -136,3 +136,9 @@
   - Обновлена документация в CONCEPTION.md
 [2026-02-22 18:27] - Завершение невыполненных пунктов Итерации 1: исправлены аннотации типов в generate_pattern, добавлены timeout в сетевые вызовы, уточнено поведение extract_value (файлы: debug_selectors.py, html_fragment.py)
 [2026-02-22 18:49] - Обработка исключений при поиске отсутствующих полей: добавлена проверка на пустые фрагменты в generate_pattern и run_parse, предотвращено IndexError (файлы: debug_selectors.py)
+
+[2026-02-22 19:21] - Реализация Итерации 2 (устойчивость и ожидаемость) (файлы: debug_selectors.py, TODO.md)
+  - Замена time.sleep(5) на WebDriverWait с защитой от анти-бот систем (функция wait_for_page_with_protection)
+  - Нормализация XPath с поддержкой normalize-space и translate для case-insensitive (функция build_xpath_text_condition)
+  - Маппинг паттернов по ключам (resource_id, label, value) вместо выбора по индексу (функция find_best_pattern)
+  - Обновление TODO.md с отметкой о выполнении Итерации 2

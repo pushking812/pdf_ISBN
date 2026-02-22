@@ -105,10 +105,10 @@
   - ✅ Удалить вводящий «pass» в extract_value и уточнить поведение.
   - ✅ Исправить аннотации типов в тестовых данных и generate_pattern.
   - ✅ Обработка исключений при поиске отсутствующих полей (добавлена проверка пустых фрагментов).
-- Итерация 2 (устойчивость и ожидаемость):
-  - Заменить sleep на WebDriverWait в search_web.
-  - Нормализовать XPath в generate_pattern (normalize-space/translate, exact/ci‑режимы).
-  - Перейти на маппинг паттернов по label/value в run_search.
+- Итерация 2 (устойчивость и ожидаемость) — **ВЫПОЛНЕНО**:
+  - ✅ Заменить sleep на WebDriverWait в search_web (реализована функция wait_for_page_with_protection).
+  - ✅ Нормализовать XPath в generate_pattern (добавлена функция build_xpath_text_condition с поддержкой normalize-space/translate).
+  - ✅ Перейти на маппинг паттернов по label/value в run_search (реализована функция find_best_pattern).
 - Итерация 3 (качество/UX):
   - Унифицировать критерии уникальности классов; расширить генерацию по всем фрагментам.
   - Параметризовать выбор атрибутов (text/href/src) и описать в докстрингах/CONCEPTION.md.
