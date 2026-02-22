@@ -117,12 +117,12 @@ def get_test_data_to_parse() -> dict[str, list[tuple[str, str]]]:
             {'label':'', 'value': 'Алексей Васильев'}, 
             {'label':'Количество страниц', 'value': '616'},
         ],
-        # "https://book.ru/book/943665": [
-        #     {'label':'', 'value': 'Математика на Python'},
-        #     {'label':'Год издания:', 'value': '2022'},
-        #     {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
-        #     {'label':'Объем:', 'value': '455 стр.'}
-        # ],
+        "https://book.ru/book/943665": [
+            {'label':'', 'value': 'Математика на Python'},
+            {'label':'Год издания:', 'value': '2022'},
+            {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
+            {'label':'Объем:', 'value': '455 стр.'}
+        ],
     }
     
 def get_test_data_to_search() -> dict[str, list[tuple[str, str]]]:
@@ -134,12 +134,12 @@ def get_test_data_to_search() -> dict[str, list[tuple[str, str]]]:
             {'label':'', 'value': 'Алексей Васильев'}, 
             {'label':'Количество страниц', 'value': '616'},
         ],
-        # "https://book.ru/book/943665": [
-        #     {'label':'', 'value': 'Математика на Python'},
-        #     {'label':'Год издания:', 'value': '2022'},
-        #     {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
-        #     {'label':'Объем:', 'value': '455 стр.'}
-        # ],
+        "https://book.ru/book/943665": [
+            {'label':'', 'value': 'Математика на Python'},
+            {'label':'Год издания:', 'value': '2022'},
+            {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
+            {'label':'Объем:', 'value': '455 стр.'}
+        ],
         # "https://book.ru/book/962004": [
         #      {'label':'', 'value': 'Многомерный анализ данных на Python'},
         #      {'label':'Год издания:', 'value': '2026'},
@@ -241,6 +241,48 @@ def generate_pattern(
             return d
         return max(nodes, key=depth)
     
+    def collect_unique_classes(element, ancestor):
+        """
+        Собирает все классы элемента и его родителей (до ancestor, не включая),
+        возвращает первый класс, уникальный внутри ancestor.
+        Если таких нет, возвращает None.
+        """
+        if not isinstance(element, Tag):
+            element = element.parent if element.parent else element
+        classes = []
+        current = element
+        while current is not None and current != ancestor:
+            if isinstance(current, Tag) and current.has_attr("class"):
+                cls = current["class"]
+                if isinstance(cls, str):
+                    cls = cls.split()
+                if isinstance(cls, list):
+                    classes.extend(cls)
+            current = current.parent
+        # Убрать дубликаты
+        seen = set()
+        unique = []
+        for cls in classes:
+            if cls not in seen:
+                seen.add(cls)
+                unique.append(cls)
+        # Проверить уникальность внутри ancestor
+        for cls in unique:
+            if len(ancestor.select(f".{cls}")) == 1:
+                return cls
+        return None
+    
+    def are_siblings(node1, node2):
+        """
+        Проверяет, являются ли два узла соседями (siblings) – имеют общего непосредственного родителя.
+        Возвращает True, если parent одинаковый и node1 != node2.
+        """
+        if node1 is None or node2 is None:
+            return False
+        parent1 = node1.parent if hasattr(node1, 'parent') else None
+        parent2 = node2.parent if hasattr(node2, 'parent') else None
+        return parent1 is not None and parent2 is not None and parent1 == parent2
+    
     for parse_frag in parse_frags:
         print("\n=== Фрагмент для генерации паттерна ===")
         print(parse_frag)
@@ -310,7 +352,11 @@ def generate_pattern(
         attribute = "text"
         if isinstance(value_node, Tag):
             if value_node.name == "a":
-                attribute = "href"
+                # Для пустого label предпочтительнее текст, если он совпадает с искомым значением
+                if label_text == "" and value_node.get_text(strip=True) == value_text:
+                    attribute = "text"
+                else:
+                    attribute = "href"
             elif value_node.has_attr("src"):
                 attribute = "src"
             elif value_node.has_attr("content"):
@@ -354,14 +400,9 @@ def generate_pattern(
             # Генерируем XPath с использованием классов и структуры
             # Определяем элемент значения (тег)
             value_element = value_node if isinstance(value_node, Tag) else value_node.parent
-            # Собираем классы элемента значения
-            value_classes = []
-            if isinstance(value_element, Tag) and value_element.has_attr("class"):
-                classes = value_element["class"]
-                if isinstance(classes, str):
-                    classes = classes.split()
-                if isinstance(classes, list):
-                    value_classes = classes
+            # Собираем уникальный класс значения (включая родительские классы)
+            selected_class = collect_unique_classes(value_element, ancestor)
+            
             # Собираем классы предка
             ancestor_classes = []
             if ancestor.has_attr("class"):
@@ -371,28 +412,32 @@ def generate_pattern(
                 if isinstance(classes, list):
                     ancestor_classes = classes
             
-            # Пытаемся построить точный XPath
-            # Вариант 1: если у значения есть уникальный класс в пределах предка
-            selected_class = None
-            for cls in value_classes:
-                # Проверяем, что этот класс встречается только один раз внутри ancestor
-                if len(ancestor.select(f".{cls}")) == 1:
-                    selected_class = cls
-                    break
+            # Определяем тег значения
+            value_tag = value_element.name if isinstance(value_element, Tag) else "*"
             
             if selected_class:
-                # XPath по классу значения с привязкой к label
+                # XPath по уникальному классу значения
                 xpath = f"//*[contains(@class, '{selected_class}')]"
             else:
-                # Используем структуру: ancestor с классом + label текст + значение по тегу
-                ancestor_class_part = ""
-                if ancestor_classes:
-                    ancestor_class_part = f"[contains(@class, '{ancestor_classes[0]}')]"
-                value_tag = value_element.name if isinstance(value_element, Tag) else "*"
-                if label_text:
-                    xpath = f"//*{ancestor_class_part}[.//*[contains(text(), '{label_text}')]]//{value_tag}"
+                # Пытаемся использовать sibling отношение, если label задан и узлы являются соседями
+                if label_text and label_node is not None and are_siblings(label_node, value_node):
+                    # Определяем тег label
+                    label_tag = label_node.name if isinstance(label_node, Tag) else "*"
+                    ancestor_class_part = ""
+                    if ancestor_classes:
+                        ancestor_class_part = f"[contains(@class, '{ancestor_classes[0]}')]"
+                    # XPath: ancestor с классом, содержащий label с текстом, затем следующий sibling значения
+                    xpath = f"//*{ancestor_class_part}[.//{label_tag}[contains(text(), '{label_text}')]]//{label_tag}[contains(text(), '{label_text}')]/following-sibling::{value_tag}"
                 else:
-                    xpath = f"//*{ancestor_class_part}//{value_tag}"
+                    # Стандартный fallback с исключением label (если label задан)
+                    ancestor_class_part = ""
+                    if ancestor_classes:
+                        ancestor_class_part = f"[contains(@class, '{ancestor_classes[0]}')]"
+                    if label_text:
+                        # Исключаем элемент, содержащий текст label
+                        xpath = f"//*{ancestor_class_part}[.//*[contains(text(), '{label_text}')]]//{value_tag}[not(contains(text(), '{label_text}'))]"
+                    else:
+                        xpath = f"//*{ancestor_class_part}//{value_tag}"
             
             pattern = {
                 "type": "xpath",
@@ -482,7 +527,9 @@ def extract_value(
                 value = element.get(attribute)
         else:  # xpath с lxml
             if attribute == "text":
-                value = element.text
+                # Используем XPath string() для извлечения всего текста элемента и его потомков
+                text = element.xpath("string()")
+                value = text if isinstance(text, str) else (text[0] if text else "")
             else:
                 value = element.get(attribute)
     
@@ -584,6 +631,7 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
         driver = create_driver(headless=False)
         driver_created = True
     
+    pattern_index = 0
     try:
         for url, pairs in search_data.items():
             print(f"\n🔍 Проверка URL: {url} с паттерном '{patterns[0]['type']}'")
@@ -593,10 +641,15 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                 time.sleep(5)
             
             for idx, pair in enumerate(pairs):
-                # Выбираем соответствующий паттерн, если есть, иначе первый
-                pattern = patterns[idx] if idx < len(patterns) else patterns[0]
+                # Выбираем паттерн по порядку среди всех сгенерированных
+                if pattern_index >= len(patterns):
+                    print(f"[ERROR] Недостаточно паттернов (index {pattern_index})")
+                    pattern = patterns[0]
+                else:
+                    pattern = patterns[pattern_index]
                 print(f"\n=== Поиск пары: '{pair['label']}' – '{pair['value']}' ===")
                 print(f"[DEBUG] Используется паттерн: {pattern['type']} -> {pattern['selector']}")
+                pattern_index += 1
                 
                 search_frags = search_web(
                     url=url,
