@@ -21,10 +21,9 @@
     - Добавить краткую заметку в докстринг про исключение body/html/[document] и дедупликацию по id().
 
 - extract_common_parent_from_url
-  - Проблема: отсутствует timeout у requests.get — возможны зависания.
+  - ✅ Проблема: отсутствует timeout у requests.get — возможны зависания. **Исправлено**: добавлен timeout=10 по умолчанию.
   - Проблема: дублирование интерфейса use_selenium/driver c extract_common_parent_from_driver — избыточная сложность.
   - Рекомендации:
-    - Добавить параметр timeout (значение по умолчанию из ScraperConfig).
     - Обрабатывать RequestException, логировать и возвращать пустой список/пробрасывать осмысленную ошибку.
     - Рассмотреть упрощение интерфейса: этот путь — только requests; Selenium — только через extract_common_parent_from_driver.
 
@@ -40,15 +39,15 @@
     - Перейти к стандартной схеме argparse (значения по умолчанию внутри функции). Тестовый режим — через --test.
 
 - get_test_data_to_parse / get_test_data_to_search
-  - Проблема: неверные аннотации типов (указаны dict[str, list[tuple[str,str]]], фактически возвращают List[Dict[label,value]]).
+  - ✅ Проблема: неверные аннотации типов (указаны dict[str, list[tuple[str,str]]], фактически возвращают List[Dict[label,value]]). **Исправлено**: сигнатура исправлена на Dict[str, List[Dict[str, str]]].
   - Рекомендации:
-    - Исправить сигнатуру на Dict[str, List[Dict[str, str]]]. Рассмотреть введение TypedDict (LabelValuePair).
+    - Рассмотреть введение TypedDict (LabelValuePair).
 
 - run_parse
-  - Критичный баг: при args.test=False собирается search_data = {url: [(label, value)]}, но далее код ожидает pair['label'] — упадет с TypeError.
+  - ✅ Критичный баг: при args.test=False собирается search_data = {url: [(label, value)]}, но далее код ожидает pair['label'] — упадет с TypeError. **Исправлено**: формат изменён на {url: [{'label': ..., 'value': ...}]}.
+  - ✅ Добавлена фильтрация пустых фрагментов (при отсутствии найденных фрагментов пара не добавляется в all_fragments).
   - Рекомендации:
-    - Привести формат к единому: {url: [{'label': ..., 'value': ...}]} и в тестовом, и в реальном режимах.
-    - Уточнить ти�� возвращаемого значения (сейчас аннотация Union[bool, list[str]] не соответствует фактической структуре кортежей с resource).
+    - Уточнить тип возвращаемого значения (сейчас аннотация Union[bool, list[str]] не соответствует фактической структуре кортежей с resource).
 
 - search_web
   - Проблема: фиксированный time.sleep(5) вместо явных ожиданий Selenium.
@@ -58,14 +57,14 @@
     - Явно валидировать комбинацию флагов: если driver передан, а is_driver=False — выдавать предупреждение/log.
 
 - generate_pattern
-  - Проблема: некорректные аннотации (parse_frags: str; -> возвращает List[Dict], а объявлен Dict).
+  - ✅ Проблема: некорректные аннотации (parse_frags: str; -> возвращает List[Dict], а объявлен Dict). **Исправлено**: сигнатура исправлена на Iterable[Tuple[...]] -> List[Dict[str, Any]].
+  - ✅ Добавлена проверка на пустые фрагменты (пропуск с предупреждением).
   - Проблема: используется только fragments[0]; остальные фрагменты игнорируются.
   - Проблема: CSS «уникальный класс» проверяется в пределах всего soup, а collect_unique_classes — внутри ancestor (несогласованность критериев).
   - Проблема: XPath строится через contains(text(), '...') без нормализации (рассинхрон с exact/normalize в поиске).
   - Проблема: эвристика выбора атрибута для <a> (text vs href) может давать неверный выбор.
   - Проблема: сложная логика подъема ancestor при пустом label может увести слишком высоко.
   - Рекомендации:
-    - Исправить типы: вход — Iterable[Tuple[url, label, value, List[str], Optional[dict]]], выход — List[Dict[str, Any]].
     - Итерироваться по всем fragments и формировать альтернативные паттерны (с приоритизацией).
     - Унифицировать критерий уникальности классов: проверять уникальность внутри ancestor (или документировать выбор «по всему фрагменту» и применять его в collect_unique_classes).
     - Генерировать нормализованные XPath: normalize-space(.), при case-insensitive — через translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'). Для exact — полное сравнение normalize-space(.) = '...' (с учетом регистра).
@@ -73,17 +72,15 @@
     - Ограничить подъем ancestor при пустом label: не подниматься до html/body; ограничить числом уровней; останавливать на первом элементе с id/class.
 
 - extract_value
-  - Проблема: вводящий в заблуждение комментарий «pass» в ветке XPath/lxml.
+  - ✅ Проблема: вводящий в заблуждение комментарий «pass» в ветке XPath/lxml. **Исправлено**: комментарий заменён на поясняющий, поведение уточнено.
   - Рекомендации:
-    - Удалить комментарий, явно описать поведение: берем elements[0], текст через string(), атрибуты — element.get(name).
     - Уточнить типы (возвращает Optional[str]).
 
 - run_search
+  - ✅ Проблема: прямой requests.get без timeout и без объединения заголовков (в отличие от html_fragment.DEFAULT_HEADERS). **Исправлено**: добавлен timeout=10, заголовки User-Agent.
   - Проблема: выбор паттерна по индексу пары (idx) — хрупко (порядок полей может не совпадать).
-  - Проблема: прямой requests.get без timeout и без объединения заголовков (в отличие от html_fragment.DEFAULT_HEADERS).
   - Рекомендации:
     - Маппить паттерны по ключам (label/value) и resource_id; подбирать по совпадению label/value, а не по позиции.
-    - Добавить timeout (из ScraperConfig) и использовать согласованные заголовки.
     - Обрабатывать RequestException с понятным логом.
 
 - main
@@ -102,11 +99,12 @@
   - Обработка RequestException/таймаутов; Selenium ожидания без sleep.
 
 Приоритетный план работ (итерации)
-- Итерация 1 (без изменения логики поиска):
-  - Исправить критичный баг в run_parse (формат пары в не‑test режиме).
-  - Добавить timeout в requests (html_fragment.extract_common_parent_from_url, debug_selectors.run_search).
-  - Удалить вводящий «pass» в extract_value и уточнить поведение.
-  - Исправить аннотации типов в тестовых данных и generate_pattern.
+- Итерация 1 (без изменения логики поиска) — **ВЫПОЛНЕНО**:
+  - ✅ Исправить критичный баг в run_parse (формат пары в не‑test режиме).
+  - ✅ Добавить timeout в requests (html_fragment.extract_common_parent_from_url, debug_selectors.run_search).
+  - ✅ Удалить вводящий «pass» в extract_value и уточнить поведение.
+  - ✅ Исправить аннотации типов в тестовых данных и generate_pattern.
+  - ✅ Обработка исключений при поиске отсутствующих полей (добавлена проверка пустых фрагментов).
 - Итерация 2 (устойчивость и ожидаемость):
   - Заменить sleep на WebDriverWait в search_web.
   - Нормализовать XPath в generate_pattern (normalize-space/translate, exact/ci‑режимы).

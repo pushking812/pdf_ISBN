@@ -1,9 +1,5 @@
 import pytest
-from api_clients import (
-    get_from_google_books,
-    get_from_open_library,
-    get_from_rsl
-)
+from api_clients import get_from_google_books, get_from_open_library, get_from_rsl
 
 pytestmark = [pytest.mark.network]
 
@@ -15,13 +11,15 @@ SYNC_CLIENTS = [
 
 
 @pytest.mark.parametrize("resource_name, client_func", SYNC_CLIENTS)
-def test_sync_client_returns_data_for_at_least_one_isbn(resource_name, client_func, isbn_list):
+def test_sync_client_returns_data_for_at_least_one_isbn(
+    resource_name, client_func, isbn_list
+):
     """
     Тест, что синхронный клиент возвращает данные хотя бы для одного ISBN.
     """
     success = False
     errors = []
-    
+
     # Ограничимся первыми 10 ISBN для скорости, но можно увеличить при необходимости
     for isbn in isbn_list[:10]:
         try:
@@ -36,6 +34,6 @@ def test_sync_client_returns_data_for_at_least_one_isbn(resource_name, client_fu
         except Exception as e:
             errors.append(f"{isbn}: {e}")
             continue
-    
+
     if not success:
         pytest.skip(f"{resource_name}: ни один ISBN не вернул данные. Ошибки: {errors}")

@@ -326,7 +326,9 @@ async def async_parallel_search(
             clean = tab.isbn.replace("-", "").strip()
             url = resource["search_url_template"].format(isbn=clean)
             if config.verbose:
-                print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, ресурс {resource.get('name')}")
+                print(
+                    f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, ресурс {resource.get('name')}"
+                )
             if resource.get("need_main_page") and tab.handle == main_handle:
                 driver.get(resource["base_url"])
                 time.sleep(random.uniform(*config.delay_after_main))
@@ -341,7 +343,11 @@ async def async_parallel_search(
             if field == "title":
                 return value == "Не удалось определить название"
             if field == "authors":
-                return isinstance(value, list) and len(value) == 1 and value[0] == "Неизвестный автор"
+                return (
+                    isinstance(value, list)
+                    and len(value) == 1
+                    and value[0] == "Неизвестный автор"
+                )
             if field == "pages":
                 return value == "не указано"
             if field == "year":
@@ -408,17 +414,27 @@ async def async_parallel_search(
                         no_product_phrases = res.get("no_product_phrases", [])
                         if no_product_phrases:
                             page_text = driver.page_source.lower()
-                            if any(phrase.lower() in page_text for phrase in no_product_phrases if phrase):
+                            if any(
+                                phrase.lower() in page_text
+                                for phrase in no_product_phrases
+                                if phrase
+                            ):
                                 if config.verbose:
-                                    print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, ресурс {res.get('name')}, ничего не найдено, переключение")
+                                    print(
+                                        f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, ресурс {res.get('name')}, ничего не найдено, переключение"
+                                    )
                                 tab.tried_resources += 1
                                 if tab.tried_resources >= len(resources):
                                     tab.state = TabState.ERROR
                                     if config.verbose:
-                                        print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, все ресурсы исчерпаны")
+                                        print(
+                                            f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, все ресурсы исчерпаны"
+                                        )
                                 else:
                                     if config.verbose:
-                                        print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, пробуем ресурс {tab.tried_resources + 1} из {len(resources)}")
+                                        print(
+                                            f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, пробуем ресурс {tab.tried_resources + 1} из {len(resources)}"
+                                        )
                                     _load_search_for_tab(
                                         tab,
                                         resources[
@@ -434,7 +450,9 @@ async def async_parallel_search(
                         if not selectors:
                             # Ресурс без селекторов (например, РГБ) — сразу парсим страницу поиска
                             if config.verbose:
-                                print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, ресурс без селекторов, переход к парсингу")
+                                print(
+                                    f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, ресурс без селекторов, переход к парсингу"
+                                )
                             time.sleep(random.uniform(*config.delay_after_click))
                             tab.state = TabState.BOOK_PAGE
                             continue
@@ -446,7 +464,9 @@ async def async_parallel_search(
                                 if href:
                                     tab.book_url = href
                                     driver.get(href)
-                                    time.sleep(random.uniform(*config.delay_after_click))
+                                    time.sleep(
+                                        random.uniform(*config.delay_after_click)
+                                    )
                                     tab.state = TabState.BOOK_PAGE
                                     found = True
                                     break
@@ -455,15 +475,21 @@ async def async_parallel_search(
                         if not found:
                             if time.time() - tab.search_start_time > tab.timeout:
                                 if config.verbose:
-                                    print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, таймаут поиска, переключение ресурса")
+                                    print(
+                                        f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, таймаут поиска, переключение ресурса"
+                                    )
                                 tab.tried_resources += 1
                                 if tab.tried_resources >= len(resources):
                                     tab.state = TabState.ERROR
                                     if config.verbose:
-                                        print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, все ресурсы исчерпаны")
+                                        print(
+                                            f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, все ресурсы исчерпаны"
+                                        )
                                 else:
                                     if config.verbose:
-                                        print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, пробуем ресурс {tab.tried_resources + 1} из {len(resources)}")
+                                        print(
+                                            f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, пробуем ресурс {tab.tried_resources + 1} из {len(resources)}"
+                                        )
                                     _load_search_for_tab(
                                         tab,
                                         resources[
@@ -476,58 +502,83 @@ async def async_parallel_search(
                                     )
                     elif tab.state == TabState.BOOK_PAGE:
                         if config.verbose:
-                            print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, парсим страницу книги")
+                            print(
+                                f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, парсим страницу книги"
+                            )
                         book_data = parse_book_page_for_resource(driver, res)
                         if book_data is None:
                             # Книга не найдена (сработала проверка no_product_phrases)
                             if config.verbose:
-                                print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, книга не найдена на ресурсе, переключение")
+                                print(
+                                    f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, книга не найдена на ресурсе, переключение"
+                                )
                             tab.tried_resources += 1
                             if tab.tried_resources >= len(resources):
                                 tab.state = TabState.ERROR
-                                tab.result = tab.accumulated_data if tab.accumulated_data else None
+                                tab.result = (
+                                    tab.accumulated_data
+                                    if tab.accumulated_data
+                                    else None
+                                )
                                 if config.verbose:
-                                    print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, все ресурсы исчерпаны")
+                                    print(
+                                        f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, все ресурсы исчерпаны"
+                                    )
                             else:
                                 if config.verbose:
-                                    print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, пробуем ресурс {tab.tried_resources + 1} из {len(resources)}")
+                                    print(
+                                        f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, пробуем ресурс {tab.tried_resources + 1} из {len(resources)}"
+                                    )
                                 _load_search_for_tab(
                                     tab,
                                     resources[
-                                        (
-                                            tab.start_resource_index
-                                            + tab.tried_resources
-                                        )
+                                        (tab.start_resource_index + tab.tried_resources)
                                         % len(resources)
                                     ],
                                 )
                         else:
                             # Объединяем данные с накопленными
-                            tab.accumulated_data = merge_book_data(tab.accumulated_data, book_data)
+                            tab.accumulated_data = merge_book_data(
+                                tab.accumulated_data, book_data
+                            )
                             # Проверяем, есть ли хотя бы одно значимое поле
                             if has_required_fields(tab.accumulated_data):
                                 # Книга найдена с достаточной информацией
                                 tab.state = TabState.DONE
                                 tab.result = tab.accumulated_data
                                 if config.verbose:
-                                    title = tab.result.get('title')
-                                    if title and not is_stub(title, 'title'):
-                                        print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, найдена книга: {title}")
+                                    title = tab.result.get("title")
+                                    if title and not is_stub(title, "title"):
+                                        print(
+                                            f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, найдена книга: {title}"
+                                        )
                                     else:
-                                        print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, книга найдена, но название не определено")
+                                        print(
+                                            f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, книга найдена, но название не определено"
+                                        )
                             else:
                                 # Данные недостаточны, продолжаем поиск на следующем ресурсе
                                 if config.verbose:
-                                    print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, данные недостаточны, переключение ресурса")
+                                    print(
+                                        f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, данные недостаточны, переключение ресурса"
+                                    )
                                 tab.tried_resources += 1
                                 if tab.tried_resources >= len(resources):
                                     tab.state = TabState.ERROR
-                                    tab.result = tab.accumulated_data if tab.accumulated_data else None
+                                    tab.result = (
+                                        tab.accumulated_data
+                                        if tab.accumulated_data
+                                        else None
+                                    )
                                     if config.verbose:
-                                        print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, все ресурсы исчерпаны")
+                                        print(
+                                            f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, все ресурсы исчерпаны"
+                                        )
                                 else:
                                     if config.verbose:
-                                        print(f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, пробуем ресурс {tab.tried_resources + 1} из {len(resources)}")
+                                        print(
+                                            f"[Скрапинг] Вкладка {tab.index}, ISBN {tab.isbn}, пробуем ресурс {tab.tried_resources + 1} из {len(resources)}"
+                                        )
                                     _load_search_for_tab(
                                         tab,
                                         resources[
@@ -616,7 +667,9 @@ async def run_api_stage(
                 remaining_isbns.append(isbn_list[idx])
                 remaining_indices.append(idx)
     if config.verbose:
-        print(f"[API] Поиск завершён. Найдено: {found_count}, не найдено: {len(remaining_isbns)}")
+        print(
+            f"[API] Поиск завершён. Найдено: {found_count}, не найдено: {len(remaining_isbns)}"
+        )
     return results, remaining_isbns, remaining_indices
 
 

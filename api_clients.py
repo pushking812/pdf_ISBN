@@ -15,6 +15,7 @@ async def get_from_google_books_async(
         ) as response:
             if response.status == 429:
                 import sys
+
                 sys.stderr.write(
                     f"[WARNING] Google Books API quota exceeded for ISBN {isbn}. "
                     "No results will be returned until quota resets.\n"

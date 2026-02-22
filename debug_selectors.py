@@ -26,23 +26,23 @@ from html_fragment import (
     lowest_common_ancestor,
 )
 from bs4 import BeautifulSoup, Tag
-from typing import Dict, Any, Union
+from typing import Dict, Any, Union, Iterable, Tuple, List
 from resources import get_resource_by_url
 from config import ScraperConfig
 
 
 def parse_arguments(
-    url: str, 
-    label: str, 
-    value: str, 
+    url: str,
+    label: str,
+    value: str,
     selenium: bool,
-    exact: bool, 
+    exact: bool,
     verbose: bool,
     test: bool,
     search_mode: str,
     case_sensitive: bool = False,
     all_matches: bool = False,
-    ) -> argparse.Namespace:
+) -> argparse.Namespace:
     """Парсит аргументы командной строки и возвращает объект с ними."""
     parser = argparse.ArgumentParser(
         description="Извлечение HTML-фрагментов по паре «название поля – значение»."
@@ -50,26 +50,26 @@ def parse_arguments(
     parser.add_argument(
         "url",
         help="URL страницы",
-        nargs='?',
+        nargs="?",
         default=url,
-        )
+    )
     parser.add_argument(
         "label",
         help="Текст названия поля (например, 'Год издания')",
-        nargs='?',
-        default = label,
-        )
+        nargs="?",
+        default=label,
+    )
     parser.add_argument(
         "value",
         help="Текст значения поля (например, '2020')",
-        nargs='?',
-        default = value,
-        )
+        nargs="?",
+        default=value,
+    )
     parser.add_argument(
         "--selenium",
         action="store_true",
         help="Использовать Selenium WebDriver (для динамических страниц)",
-        default = selenium,
+        default=selenium,
     )
     parser.add_argument(
         "--exact",
@@ -81,13 +81,13 @@ def parse_arguments(
         "--case-sensitive",
         action="store_true",
         help="Учитывать регистр (по умолчанию – нет)",
-        default = case_sensitive,
+        default=case_sensitive,
     )
     parser.add_argument(
         "--all-matches",
         action="store_true",
         help="Показать все найденные фрагменты (по умолчанию – только первый)",
-        default = all_matches,
+        default=all_matches,
     )
     parser.add_argument(
         "--verbose",
@@ -110,62 +110,69 @@ def parse_arguments(
     return parser.parse_args()
 
 
-def get_test_data_to_parse() -> dict[str, list[tuple[str, str]]]:
+def get_test_data_to_parse() -> dict[str, list[dict[str, str]]]:
     """Возвращает тестовый набор данных (URL -> список пар label-value)."""
     return {
         "https://search.rsl.ru/ru/record/01010115385": [
-            {'label':'Автор', 'value': 'МакГрат, Майк'},
-            {'label':'Заглавие', 'value': 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+'},
-            {'label':'Выходные данные', 'value': 'Москва : Эксмо, 2019'},
-            {'label':'Физическое описание', 'value': '192 с. : ил.; 26 см'},
+            {"label": "Автор", "value": "МакГрат, Майк"},
+            {
+                "label": "Заглавие",
+                "value": "Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+",
+            },
+            {"label": "Выходные данные", "value": "Москва : Эксмо, 2019"},
+            {"label": "Физическое описание", "value": "192 с. : ил.; 26 см"},
         ],
-        # "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
-        #     {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
-        #     {'label':'Год издания', 'value': '2025'},
-        #     {'label':'', 'value': 'Алексей Васильев'}, 
-        #     {'label':'Количество страниц', 'value': '616'},
-        # ],
-        # "https://book.ru/book/943665": [
-        #     {'label':'', 'value': 'Математика на Python'},
-        #     {'label':'Год издания:', 'value': '2022'},
-        #     {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
-        #     {'label':'Объем:', 'value': '455 стр.'}
-        # ],
+        "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
+            {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
+            {'label':'Год издания', 'value': '2025'},
+            {'label':'Автор', 'value': 'Алексей Васильев'},
+            {'label':'Количество страниц', 'value': '616'},
+        ],
+        "https://book.ru/book/943665": [
+            {'label':'', 'value': 'Математика на Python'},
+            {'label':'Год издания:', 'value': '2022'},
+            {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
+            {'label':'Объем:', 'value': '455 стр.'}
+        ],
     }
-    
-def get_test_data_to_search() -> dict[str, list[tuple[str, str]]]:
+
+
+def get_test_data_to_search() -> dict[str, list[dict[str, str]]]:
     """Возвращает тестовый набор данных (URL -> список пар label-value)."""
     return {
         "https://search.rsl.ru/ru/record/01010115385": [
-            {'label':'Автор', 'value': 'МакГрат, Майк'},
-            {'label':'Заглавие', 'value': 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+'},
-            {'label':'Выходные данные', 'value': 'Москва : Эксмо, 2019'},
-            {'label':'Физическое описание', 'value': '192 с. : ил.; 26 см'},
+            {"label": "Автор", "value": "МакГрат, Майк"},
+            {
+                "label": "Заглавие",
+                "value": "Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+",
+            },
+            {"label": "Выходные данные", "value": "Москва : Эксмо, 2019"},
+            {"label": "Физическое описание", "value": "192 с. : ил.; 26 см"},
         ],
-        # "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
-        #     {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
-        #     {'label':'Год издания', 'value': '2025'},
-        #     {'label':'', 'value': 'Алексей Васильев'}, 
-        #     {'label':'Количество страниц', 'value': '616'},
-        # ],
-        # "https://book.ru/book/943665": [
-        #     {'label':'', 'value': 'Математика на Python'},
-        #     {'label':'Год издания:', 'value': '2022'},
-        #     {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
-        #     {'label':'Объем:', 'value': '455 стр.'}
-        # ],
-        # "https://book.ru/book/962004": [
-        #      {'label':'', 'value': 'Многомерный анализ данных на Python'},
-        #      {'label':'Год издания:', 'value': '2026'},
-        #      {'label':'Авторы:', 'value': 'Паршинцева Л.С., Паршинцев А.А.'},
-        #      {'label':'Объем:', 'value': '129 стр.'}
-        # ],
-        # "https://book.ru/book/960946": [
-        #     {'label':'', 'value': 'Практикум изучения языка программирования PYTHON. Начальный уровень'},
-        #     {'label':'Год издания:', 'value': '2026'},
-        #     {'label':'Авторы:', 'value': 'Щербаков А.Г.'},
-        #     {'label':'Объем:', 'value': '116 стр.'}
-        # ],
+        "https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349": [
+            {'label':'', 'value': 'Программирование на Python в примерах и задачах'},
+            {'label':'Год издания', 'value': '2025'},
+            {'label':'', 'value': 'Алексей Васильев'},
+            {'label':'Количество страниц', 'value': '616'},
+        ],
+        "https://book.ru/book/943665": [
+            {'label':'', 'value': 'Математика на Python'},
+            {'label':'Год издания:', 'value': '2022'},
+            {'label':'Авторы:', 'value': 'Криволапов С.Я., Хрипунова М.Б.'},
+            {'label':'Объем:', 'value': '455 стр.'}
+        ],
+        "https://book.ru/book/962004": [
+             {'label':'', 'value': 'Многомерный анализ данных на Python'},
+             {'label':'Год издания:', 'value': '2026'},
+             {'label':'Авторы:', 'value': 'Паршинцева Л.С., Паршинцев А.А.'},
+             {'label':'Объем:', 'value': '129 стр.'}
+        ],
+        "https://book.ru/book/960946": [
+            {'label':'', 'value': 'Практикум изучения языка программирования PYTHON. Начальный уровень'},
+            {'label':'Год издания:', 'value': '2026'},
+            {'label':'Авторы:', 'value': 'Щербаков А.Г.'},
+            {'label':'Объем:', 'value': '116 стр.'}
+        ],
     }
 
 
@@ -173,6 +180,7 @@ def create_driver(headless: bool = False) -> WebDriver:
     """Создаёт и возвращает экземпляр ChromeDriver."""
     from drivers import create_chrome_driver
     from config import ScraperConfig
+
     config = ScraperConfig(headless=headless)
     return create_chrome_driver(config)
 
@@ -230,9 +238,9 @@ def search_web(
 
 
 def generate_pattern(
-    parse_frags: str,
+    parse_frags: Iterable[Tuple[str, str, str, List[str], Optional[Dict]]],
     args: argparse.Namespace,
-) -> Dict[str, Any]:
+) -> List[Dict[str, Any]]:
     """
     Генерирует универсальный паттерн (CSS-селектор или XPath) для извлечения значения поля
     по фрагменту HTML, содержащему пару «ключевое поле – значение».
@@ -241,20 +249,22 @@ def generate_pattern(
     exact_label: bool = args.exact
     exact_value: bool = args.exact
     case_sensitive: bool = args.case_sensitive
-    
+
     patterns = []
-    
+
     def get_deepest_node(nodes):
         if not nodes:
             return None
+
         def depth(node):
             d = 0
             while node is not None:
                 node = node.parent
                 d += 1
             return d
+
         return max(nodes, key=depth)
-    
+
     def collect_unique_classes(element, ancestor):
         """
         Собирает все классы элемента и его родителей (до ancestor, не включая),
@@ -285,7 +295,7 @@ def generate_pattern(
             if len(ancestor.select(f".{cls}")) == 1:
                 return cls
         return None
-    
+
     def are_siblings(node1, node2):
         """
         Проверяет, являются ли два узла соседями (siblings) – имеют общего непосредственного родителя.
@@ -293,15 +303,15 @@ def generate_pattern(
         """
         if node1 is None or node2 is None:
             return False
-        parent1 = node1.parent if hasattr(node1, 'parent') else None
-        parent2 = node2.parent if hasattr(node2, 'parent') else None
+        parent1 = node1.parent if hasattr(node1, "parent") else None
+        parent2 = node2.parent if hasattr(node2, "parent") else None
         return parent1 is not None and parent2 is not None and parent1 == parent2
-    
+
     for parse_frag in parse_frags:
         print("\n=== Фрагмент для генерации паттерна ===")
         print(parse_frag)
         print("=" * 50)
-        
+
         # Определяем структуру кортежа (старая vs новая)
         if len(parse_frag) == 5:
             url, label_text, value_text, fragments, resource = parse_frag
@@ -309,17 +319,30 @@ def generate_pattern(
             # старая версия (4 элемента)
             url, label_text, value_text, fragments = parse_frag
             resource = None
-    
-        soup = BeautifulSoup(fragments[0], "lxml") # html фрагмент
-    
+
+        # Проверяем, что есть хотя бы один фрагмент
+        if not fragments:
+            print(f"[WARN] Пропуск фрагмента: label='{label_text}', value='{value_text}' - фрагменты не найдены")
+            continue
+
+        soup = BeautifulSoup(fragments[0], "lxml")  # html фрагмент
+
         # Находим узлы label и value
         if search_mode == "text":
-            label_nodes = find_text_nodes(soup, label_text, exact=exact_label, case_sensitive=case_sensitive)
-            value_nodes = find_text_nodes(soup, value_text, exact=exact_value, case_sensitive=case_sensitive)
+            label_nodes = find_text_nodes(
+                soup, label_text, exact=exact_label, case_sensitive=case_sensitive
+            )
+            value_nodes = find_text_nodes(
+                soup, value_text, exact=exact_value, case_sensitive=case_sensitive
+            )
         else:
-            label_nodes = find_elements_by_text(soup, label_text, exact=exact_label, case_sensitive=case_sensitive)
-            value_nodes = find_elements_by_text(soup, value_text, exact=exact_value, case_sensitive=case_sensitive)
-    
+            label_nodes = find_elements_by_text(
+                soup, label_text, exact=exact_label, case_sensitive=case_sensitive
+            )
+            value_nodes = find_elements_by_text(
+                soup, value_text, exact=exact_value, case_sensitive=case_sensitive
+            )
+
         # Обработка пустого label
         if label_text == "":
             # label не задан, игнорируем label_nodes
@@ -328,21 +351,31 @@ def generate_pattern(
                 raise ValueError("Не удалось найти value во фрагменте")
             value_node = get_deepest_node(value_nodes)
             # Определяем элемент значения (тег)
-            value_element = value_node if isinstance(value_node, Tag) else value_node.parent
+            value_element = (
+                value_node if isinstance(value_node, Tag) else value_node.parent
+            )
             # Используем value_element в качестве ancestor (ближайший тег)
             ancestor = value_element
             # Попробуем подняться к родителю, если текущий ancestor не имеет отличительных признаков
             while ancestor is not None and isinstance(ancestor, Tag):
-                has_id = ancestor.has_attr('id')
-                has_class = ancestor.has_attr('class')
+                has_id = ancestor.has_attr("id")
+                has_class = ancestor.has_attr("class")
                 if has_id or has_class:
                     break
                 parent = ancestor.parent
-                if parent is None or not isinstance(parent, Tag) or parent.name in ('body', 'html', '[document]'):
+                if (
+                    parent is None
+                    or not isinstance(parent, Tag)
+                    or parent.name in ("body", "html", "[document]")
+                ):
                     break
                 ancestor = parent
             # Если ancestor всё ещё слишком высокий, попробуем найти более подходящего предка
-            while ancestor is not None and isinstance(ancestor, Tag) and ancestor.name in ('body', 'html', '[document]'):
+            while (
+                ancestor is not None
+                and isinstance(ancestor, Tag)
+                and ancestor.name in ("body", "html", "[document]")
+            ):
                 if ancestor.parent is not None:
                     ancestor = ancestor.parent
                 else:
@@ -356,17 +389,23 @@ def generate_pattern(
 
         # Отладочная информация
         if args.verbose:
-            print(f"[DEBUG generate_pattern] label_text={label_text!r}, value_text={value_text!r}")
-            print(f"[DEBUG generate_pattern] value_node type={type(value_node)}, value_node={value_node}")
-            print(f"[DEBUG generate_pattern] ancestor type={type(ancestor)}, ancestor={ancestor}")
-            if hasattr(value_node, 'name'):
+            print(
+                f"[DEBUG generate_pattern] label_text={label_text!r}, value_text={value_text!r}"
+            )
+            print(
+                f"[DEBUG generate_pattern] value_node type={type(value_node)}, value_node={value_node}"
+            )
+            print(
+                f"[DEBUG generate_pattern] ancestor type={type(ancestor)}, ancestor={ancestor}"
+            )
+            if hasattr(value_node, "name"):
                 print(f"[DEBUG generate_pattern] value_node.name={value_node.name}")
             if isinstance(ancestor, Tag):
                 print(f"[DEBUG generate_pattern] ancestor.name={ancestor.name}")
-        
+
         if ancestor is None:
             raise ValueError("Не удалось найти общего предка для label и value")
-    
+
         # Определяем атрибут для извлечения
         attribute = "text"
         if isinstance(value_node, Tag):
@@ -380,7 +419,7 @@ def generate_pattern(
                 attribute = "src"
             elif value_node.has_attr("content"):
                 attribute = "content"
-    
+
         # Пытаемся построить CSS-селектор по уникальному классу или id
         def get_css_selector(element: Tag) -> str:
             # Если есть id – используем его
@@ -399,11 +438,11 @@ def generate_pattern(
             # Иначе селектор по тегу с учётом родительской структуры (упрощённо)
             # Пока вернём пустую строку, чтобы переключиться на XPath
             return ""
-    
+
         css_selector = ""
         if isinstance(value_node, Tag):
             css_selector = get_css_selector(value_node)
-    
+
         if css_selector:
             # Проверим, что селектор уникально выбирает value внутри ancestor
             # (пропустим сложную проверку)
@@ -419,10 +458,12 @@ def generate_pattern(
         else:
             # Генерируем XPath с использованием классов и структуры
             # Определяем элемент значения (тег)
-            value_element = value_node if isinstance(value_node, Tag) else value_node.parent
+            value_element = (
+                value_node if isinstance(value_node, Tag) else value_node.parent
+            )
             # Собираем уникальный класс значения (включая родительские классы)
             selected_class = collect_unique_classes(value_element, ancestor)
-            
+
             # Собираем классы предка
             ancestor_classes = []
             if ancestor.has_attr("class"):
@@ -431,34 +472,42 @@ def generate_pattern(
                     classes = classes.split()
                 if isinstance(classes, list):
                     ancestor_classes = classes
-            
+
             # Определяем тег значения
             value_tag = value_element.name if isinstance(value_element, Tag) else "*"
-            
+
             if selected_class:
                 # XPath по уникальному классу значения
                 xpath = f"//*[contains(@class, '{selected_class}')]"
             else:
                 # Пытаемся использовать sibling отношение, если label задан и узлы являются соседями
-                if label_text and label_node is not None and are_siblings(label_node, value_node):
+                if (
+                    label_text
+                    and label_node is not None
+                    and are_siblings(label_node, value_node)
+                ):
                     # Определяем тег label
                     label_tag = label_node.name if isinstance(label_node, Tag) else "*"
                     ancestor_class_part = ""
                     if ancestor_classes:
-                        ancestor_class_part = f"[contains(@class, '{ancestor_classes[0]}')]"
+                        ancestor_class_part = (
+                            f"[contains(@class, '{ancestor_classes[0]}')]"
+                        )
                     # XPath: ancestor с классом, содержащий label с текстом, затем следующий sibling значения
                     xpath = f"//*{ancestor_class_part}[.//{label_tag}[contains(text(), '{label_text}')]]//{label_tag}[contains(text(), '{label_text}')]/following-sibling::{value_tag}"
                 else:
                     # Стандартный fallback с исключением label (если label задан)
                     ancestor_class_part = ""
                     if ancestor_classes:
-                        ancestor_class_part = f"[contains(@class, '{ancestor_classes[0]}')]"
+                        ancestor_class_part = (
+                            f"[contains(@class, '{ancestor_classes[0]}')]"
+                        )
                     if label_text:
                         # Исключаем элемент, содержащий текст label
                         xpath = f"//*{ancestor_class_part}[.//*[contains(text(), '{label_text}')]]//{value_tag}[not(contains(text(), '{label_text}'))]"
                     else:
                         xpath = f"//*{ancestor_class_part}//{value_tag}"
-            
+
             pattern = {
                 "type": "xpath",
                 "selector": xpath,
@@ -468,11 +517,13 @@ def generate_pattern(
                 "clean_regex": None,
                 "resource_id": resource.get("id") if resource else None,
             }
-            
-        print(f"Сгенерирован паттерн: {pattern['type']} -> {pattern['selector']} (атрибут: {pattern['attribute']})")
-        
+
+        print(
+            f"Сгенерирован паттерн: {pattern['type']} -> {pattern['selector']} (атрибут: {pattern['attribute']})"
+        )
+
         patterns.append(pattern)
-        
+
     return patterns
 
 
@@ -487,13 +538,17 @@ def extract_value(
     from selenium.webdriver.common.by import By
 
     # Определяем, работаем ли с Selenium
-    is_selenium = use_selenium if use_selenium is not None else isinstance(html_or_driver, WebDriver)
-    
+    is_selenium = (
+        use_selenium
+        if use_selenium is not None
+        else isinstance(html_or_driver, WebDriver)
+    )
+
     if is_selenium:
         driver = html_or_driver
         selector = pattern["selector"]
         selector_type = pattern["type"]
-        
+
         try:
             if selector_type == "css":
                 element = driver.find_element(By.CSS_SELECTOR, selector)
@@ -509,7 +564,7 @@ def extract_value(
         soup = BeautifulSoup(html, "lxml")
         selector = pattern["selector"]
         selector_type = pattern["type"]
-        
+
         if selector_type == "css":
             element = soup.select_one(selector)
             if element is None:
@@ -517,23 +572,24 @@ def extract_value(
         elif selector_type == "xpath":
             # Используем lxml для XPath
             from lxml import etree
+
             tree = etree.HTML(html)
             try:
                 elements = tree.xpath(selector)
                 if not elements:
                     return None
                 element = elements[0]
-                # Преобразуем элемент lxml в строку для извлечения атрибутов/текста
-                # Для простоты будем работать с lxml.etree._Element
-                pass
+                # Элемент lxml.etree._Element, извлекаем значение в зависимости от атрибута
+                # Обработка будет выполнена ниже в общем блоке кода
+                pass  # Продолжаем выполнение, element уже содержит lxml элемент
             except Exception:
                 return None
         else:
             raise ValueError(f"Неизвестный тип селектора: {selector_type}")
-    
+
     # Извлекаем значение в зависимости от атрибута
     attribute = pattern.get("attribute", "text")
-    
+
     if is_selenium:
         if attribute == "text":
             value = element.text
@@ -553,18 +609,19 @@ def extract_value(
                 value = text if isinstance(text, str) else (text[0] if text else "")
             else:
                 value = element.get(attribute)
-    
+
     if value is None:
         return None
-    
+
     # Применяем clean_regex, если есть
     clean_regex = pattern.get("clean_regex")
     if clean_regex and value:
         import re
+
         match = re.search(clean_regex, value)
         if match:
             value = match.group(1) if match.groups() else match.group(0)
-    
+
     return value.strip() if isinstance(value, str) else str(value)
 
 
@@ -591,9 +648,7 @@ def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
     if args.test:
         search_data = get_test_data_to_parse()
     else:
-        search_data = {
-            args.url: [(args.label, args.value)]
-        }
+        search_data = {args.url: [{"label": args.label, "value": args.value}]}
 
     all_fragments = []
     driver_created = False
@@ -609,16 +664,17 @@ def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
                 driver.get(url)
                 time.sleep(5)
 
-            
             for pair in pairs:
                 if args.verbose:
-                    print(f"\n=== Поиск пары: '{pair['label']}' – '{pair['value']}' ===")
+                    print(
+                        f"\n=== Поиск пары: '{pair['label']}' – '{pair['value']}' ==="
+                    )
 
                 fragments = search_web(
                     url,
                     is_driver=args.selenium,
-                    label=pair['label'],
-                    value=pair['value'],
+                    label=pair["label"],
+                    value=pair["value"],
                     exact_label=args.exact,
                     exact_value=args.exact,
                     case_sensitive=args.case_sensitive,
@@ -629,7 +685,13 @@ def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
                 )
                 config = ScraperConfig()
                 resource = get_resource_by_url(url, config)
-                all_fragments.extend([(url, pair['label'], pair['value'], fragments, resource)])
+                if fragments:
+                    all_fragments.extend(
+                        [(url, pair["label"], pair["value"], fragments, resource)]
+                    )
+                else:
+                    if args.verbose:
+                        print(f"[WARN] Для пары '{pair['label']}' - '{pair['value']}' фрагменты не найдены")
     finally:
         if driver_created and driver:
             driver.quit()
@@ -637,23 +699,25 @@ def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
     if not all_fragments:
         print("❌ Фрагменты не найдены.")
         if not args.verbose:
-            print("💡 Попробуйте запустить с параметром --verbose, чтобы увидеть отладочную информацию.")
+            print(
+                "💡 Попробуйте запустить с параметром --verbose, чтобы увидеть отладочную информацию."
+            )
         return False
 
-    print_fragments(all_fragments) # html фрагменты для первой пары (для наглядности)
+    print_fragments(all_fragments)  # html фрагменты для первой пары (для наглядности)
     return all_fragments
 
 
 def run_search(args, patterns, driver=None) -> list[Optional[str]]:
     search_data = get_test_data_to_search()
     all_extracted = []
-    
+
     # Создаём драйвер один раз, если используется Selenium
     driver_created = False
     if driver is None and args.selenium:
         driver = create_driver(headless=False)
         driver_created = True
-    
+
     # Группируем паттерны по resource_id для быстрого поиска
     patterns_by_resource = {}
     patterns_without_resource = []
@@ -663,16 +727,16 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
             patterns_by_resource.setdefault(resource_id, []).append(pat)
         else:
             patterns_without_resource.append(pat)
-    
+
     # Конфиг для определения ресурса по URL
     config = ScraperConfig()
-    
+
     try:
         for url, pairs in search_data.items():
             # Определяем ресурс по URL
             resource = get_resource_by_url(url, config)
             resource_id = resource.get("id") if resource else None
-            
+
             # Получаем список паттернов для данного ресурса
             resource_patterns = []
             if resource_id and resource_id in patterns_by_resource:
@@ -683,17 +747,17 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                 resource_patterns = patterns
             else:
                 print("[ERROR] Нет доступных паттернов")
-            
+
             print(f"\n🔍 Проверка URL: {url} (ресурс: {resource_id})")
             print(f"   Доступно паттернов для ресурса: {len(resource_patterns)}")
-            
+
             if driver:
                 driver.get(url)
                 time.sleep(5)
-            
+
             for idx, pair in enumerate(pairs):
                 print(f"\n=== Поиск пары: '{pair['label']}' – '{pair['value']}' ===")
-                
+
                 # Выбираем паттерн по порядку (если хватает)
                 pattern = None
                 if resource_patterns:
@@ -701,17 +765,19 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                     pattern = resource_patterns[pattern_idx]
                 else:
                     pattern = None
-                
+
                 if pattern:
-                    print(f"[DEBUG] Используется паттерн: {pattern['type']} -> {pattern['selector']}")
+                    print(
+                        f"[DEBUG] Используется паттерн: {pattern['type']} -> {pattern['selector']}"
+                    )
                 else:
                     print("[WARN] Не удалось выбрать паттерн для извлечения")
-                
+
                 search_frags = search_web(
                     url=url,
                     is_driver=args.selenium,
-                    label=pair['label'],
-                    value=pair['value'],
+                    label=pair["label"],
+                    value=pair["value"],
                     exact_label=args.exact,
                     exact_value=args.exact,
                     case_sensitive=args.case_sensitive,
@@ -720,7 +786,7 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                     search_mode=args.search_mode,
                     driver=driver,
                 )
-                
+
                 if not search_frags:
                     print("[WARN] Фрагменты не найдены, пропускаем")
                     # Пытаемся извлечь значение напрямую по паттерну, если он есть
@@ -731,8 +797,13 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                             # Загружаем HTML через requests
                             import requests
                             from requests.exceptions import RequestException
+
                             try:
-                                resp = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'})
+                                resp = requests.get(
+                                    url,
+                                    headers={"User-Agent": "Mozilla/5.0"},
+                                    timeout=10,
+                                )
                                 resp.raise_for_status()
                                 extracted = extract_value(resp.text, pattern)
                             except RequestException as e:
@@ -745,16 +816,17 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                 else:
                     extracted = None
                     print("[ERROR] Не удалось выбрать паттерн для извлечения")
-                
+
                 print(f"Извлечённое значение: {extracted}")
-        
+
                 all_extracted.append(extracted)
     finally:
         if driver_created and driver is not None:
             driver.quit()
-    
+
     return all_extracted
-    
+
+
 def main() -> None:
     default_arg_values = {
         "url": r"https://book.ru/book/943665",
@@ -778,16 +850,14 @@ def main() -> None:
         if not parse_frags:
             print("   ❌ Фрагменты не найдены.")
             sys.exit(1)
-            
-        patterns = generate_pattern(
-            parse_frags,
-            args = args
-        )
-        
+
+        patterns = generate_pattern(parse_frags, args=args)
+
         run_search(args, patterns, driver=driver)
     finally:
         if driver is not None:
             driver.quit()
+
 
 if __name__ == "__main__":
     main()

@@ -2,6 +2,7 @@
 from scraper import search_multiple_books
 from config import ScraperConfig
 
+
 def main():
     isbns = ["9781835081167", "0134173279", "9785977520966"]
     config = ScraperConfig()
@@ -12,6 +13,7 @@ def main():
     results = search_multiple_books(isbns, config)
     for isbn, res in zip(isbns, results):
         print(f"{isbn}: {res}")
+
 
 if __name__ == "__main__":
     main()

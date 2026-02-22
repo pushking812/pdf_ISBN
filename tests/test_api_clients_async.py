@@ -2,7 +2,7 @@ import pytest
 from api_clients import (
     get_from_google_books_async,
     get_from_open_library_async,
-    get_from_rsl_async
+    get_from_rsl_async,
 )
 
 pytestmark = [pytest.mark.network]
@@ -24,7 +24,7 @@ async def test_async_client_returns_data_for_at_least_one_isbn(
     """
     success = False
     errors = []
-    
+
     for isbn in isbn_list[:10]:
         try:
             result = await client_func(aiohttp_session, isbn)
@@ -37,6 +37,6 @@ async def test_async_client_returns_data_for_at_least_one_isbn(
         except Exception as e:
             errors.append(f"{isbn}: {e}")
             continue
-    
+
     if not success:
         pytest.skip(f"{resource_name}: ни один ISBN не вернул данные. Ошибки: {errors}")

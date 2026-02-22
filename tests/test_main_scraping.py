@@ -2,11 +2,14 @@
 """
 Тест обновлённой функции run_scraping_stage.
 """
+
 import asyncio
 import sys
-sys.path.insert(0, '.')
+
+sys.path.insert(0, ".")
 from main import run_scraping_stage
 from config import ScraperConfig
+
 
 async def main():
     isbns = ["9781835081167", "9780134173276", "9781805125105"]  # реальные ISBN из кэша
@@ -23,6 +26,7 @@ async def main():
             print(f"  {isbn}: {res.get('title')} ({res.get('source')})")
         else:
             print(f"  {isbn}: не найдено")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

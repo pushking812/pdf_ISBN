@@ -28,6 +28,7 @@ DEFAULT_HEADERS = {
     "Cache-Control": "max-age=0",
 }
 
+
 def find_elements_by_text(
     soup: BeautifulSoup,
     text: str,
@@ -45,8 +46,8 @@ def find_elements_by_text(
         needle = text if case_sensitive else text.lower()
         if exact:
             # Нормализуем пробелы: удаляем лишние пробелы и приводим к одному пробелу
-            normalized_target = re.sub(r'\s+', ' ', target.strip())
-            normalized_needle = re.sub(r'\s+', ' ', needle.strip())
+            normalized_target = re.sub(r"\s+", " ", target.strip())
+            normalized_needle = re.sub(r"\s+", " ", needle.strip())
             return normalized_target == normalized_needle
         else:
             return needle in target
@@ -78,8 +79,8 @@ def find_text_nodes(
         needle = text if case_sensitive else text.lower()
         if exact:
             # Нормализуем пробелы: удаляем лишние пробелы и приводим к одному пробелу
-            normalized_target = re.sub(r'\s+', ' ', target.strip())
-            normalized_needle = re.sub(r'\s+', ' ', needle.strip())
+            normalized_target = re.sub(r"\s+", " ", target.strip())
+            normalized_needle = re.sub(r"\s+", " ", needle.strip())
             return normalized_target == normalized_needle
         else:
             return needle in target
@@ -95,6 +96,7 @@ def lowest_common_ancestor(
     """
     Возвращает наименьшего общего предка (LCA) двух узлов дерева BeautifulSoup.
     """
+
     # Приводим узлы к тегам (для NavigableString берём родителя)
     def to_tag(node: PageElement) -> Optional[Tag]:
         if isinstance(node, Tag):
@@ -112,12 +114,20 @@ def lowest_common_ancestor(
     ancestors_a: List[Tag] = []
     while tag_a is not None:
         ancestors_a.append(tag_a)
-        tag_a = tag_a.parent if tag_a.parent is not None and tag_a.parent.name != "[document]" else None
+        tag_a = (
+            tag_a.parent
+            if tag_a.parent is not None and tag_a.parent.name != "[document]"
+            else None
+        )
 
     ancestors_b: List[Tag] = []
     while tag_b is not None:
         ancestors_b.append(tag_b)
-        tag_b = tag_b.parent if tag_b.parent is not None and tag_b.parent.name != "[document]" else None
+        tag_b = (
+            tag_b.parent
+            if tag_b.parent is not None and tag_b.parent.name != "[document]"
+            else None
+        )
 
     # Ищем последний общий тег с конца (самый глубокий)
     common = None
@@ -148,15 +158,24 @@ def extract_common_parent_html(
     if verbose:
         print(f"[DEBUG] Режим поиска: {search_mode}")
 
-
     if search_mode == "text":
-        label_nodes = find_text_nodes(soup, label_text, exact=exact_label, case_sensitive=case_sensitive)
-        value_nodes = find_text_nodes(soup, value_text, exact=exact_value, case_sensitive=case_sensitive)
+        label_nodes = find_text_nodes(
+            soup, label_text, exact=exact_label, case_sensitive=case_sensitive
+        )
+        value_nodes = find_text_nodes(
+            soup, value_text, exact=exact_value, case_sensitive=case_sensitive
+        )
     elif search_mode == "element":
-        label_nodes = find_elements_by_text(soup, label_text, exact=exact_label, case_sensitive=case_sensitive)
-        value_nodes = find_elements_by_text(soup, value_text, exact=exact_value, case_sensitive=case_sensitive)
+        label_nodes = find_elements_by_text(
+            soup, label_text, exact=exact_label, case_sensitive=case_sensitive
+        )
+        value_nodes = find_elements_by_text(
+            soup, value_text, exact=exact_value, case_sensitive=case_sensitive
+        )
     else:
-        raise ValueError(f"Неизвестный search_mode: {search_mode}. Допустимые значения: 'text', 'element'.")
+        raise ValueError(
+            f"Неизвестный search_mode: {search_mode}. Допустимые значения: 'text', 'element'."
+        )
 
     if verbose:
         print(f"[DEBUG] Найдено узлов с label '{label_text}': {len(label_nodes)}")
@@ -184,7 +203,9 @@ def extract_common_parent_html(
     # Если label_text не пустой, но label_nodes отсутствуют — тоже возвращаем пустой список
     if label_text and not label_nodes:
         if verbose:
-            print("[DEBUG] Не найдены label узлы (при непустом label), возвращаем пустой список.")
+            print(
+                "[DEBUG] Не найдены label узлы (при непустом label), возвращаем пустой список."
+            )
         return []
 
     # Обработка случая, когда метка отсутствует (пустой label_text)
@@ -198,7 +219,7 @@ def extract_common_parent_html(
             if ancestor is None:
                 continue
             # Пропустить слишком высокие предки (body, html, document)
-            if ancestor.name in ('body', 'html', '[document]'):
+            if ancestor.name in ("body", "html", "[document]"):
                 if verbose:
                     print(f"[DEBUG] Пропущен предок с тегом {ancestor.name}")
                 continue
@@ -226,16 +247,26 @@ def extract_common_parent_html(
         for val in value_nodes:
             pair_index += 1
             if verbose:
-                lbl_text = lbl.get_text(strip=True)[:50] if hasattr(lbl, 'get_text') else str(lbl)[:50]
-                val_text = val.get_text(strip=True)[:50] if hasattr(val, 'get_text') else str(val)[:50]
-                print(f"[DEBUG] Пара {pair_index}: label='{lbl_text}', value='{val_text}'")
+                lbl_text = (
+                    lbl.get_text(strip=True)[:50]
+                    if hasattr(lbl, "get_text")
+                    else str(lbl)[:50]
+                )
+                val_text = (
+                    val.get_text(strip=True)[:50]
+                    if hasattr(val, "get_text")
+                    else str(val)[:50]
+                )
+                print(
+                    f"[DEBUG] Пара {pair_index}: label='{lbl_text}', value='{val_text}'"
+                )
             ancestor = lowest_common_ancestor(lbl, val)
             if ancestor is None:
                 if verbose:
-                    print(f"[DEBUG]   LCA не найден")
+                    print("[DEBUG]   LCA не найден")
                 continue
             # Пропустить слишком высокие предки (body, html, document)
-            if ancestor.name in ('body', 'html', '[document]'):
+            if ancestor.name in ("body", "html", "[document]"):
                 if verbose:
                     print(f"[DEBUG] Пропущен предок с тегом {ancestor.name}")
                 continue
@@ -285,13 +316,16 @@ def extract_common_parent_from_url(
     else:
         # Добавляем заголовки по умолчанию, если не переданы свои
         kwargs = dict(request_kwargs)
-        if 'headers' not in kwargs:
-            kwargs['headers'] = DEFAULT_HEADERS
+        if "headers" not in kwargs:
+            kwargs["headers"] = DEFAULT_HEADERS
         else:
             # Объединяем переданные заголовки с default, приоритет у переданных
             merged_headers = DEFAULT_HEADERS.copy()
-            merged_headers.update(kwargs['headers'])
-            kwargs['headers'] = merged_headers
+            merged_headers.update(kwargs["headers"])
+            kwargs["headers"] = merged_headers
+        # Добавляем timeout по умолчанию, если не указан
+        if "timeout" not in kwargs:
+            kwargs["timeout"] = 10
         response = requests.get(url, **kwargs)
         response.raise_for_status()
         html = response.text
@@ -339,6 +373,7 @@ def extract_common_parent_from_driver(
 if __name__ == "__main__":
     # Пример использования для отладки
     import sys
+
     if len(sys.argv) < 4:
         print(
             "Использование: python html_fragment.py <URL> <label_text> <value_text> [--selenium]"
@@ -352,6 +387,7 @@ if __name__ == "__main__":
         if use_selenium:
             from drivers import create_chrome_driver
             from config import ScraperConfig
+
             config = ScraperConfig(headless=False)
             driver = create_chrome_driver(config)
             driver.get(url)

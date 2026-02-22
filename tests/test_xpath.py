@@ -1,9 +1,10 @@
 import sys
-sys.path.append('.')
+
+sys.path.append(".")
 from lxml import etree
 import requests
 
-url = 'https://search.rsl.ru/ru/record/01010115385'
+url = "https://search.rsl.ru/ru/record/01010115385"
 response = requests.get(url)
 html = response.text
 tree = etree.HTML(html)

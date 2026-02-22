@@ -188,8 +188,7 @@ def is_book_data_complete(record: Optional[Dict[str, Any]]) -> bool:
         return False
     # Проверяем, что хотя бы один автор не является заглушкой
     all_authors_stub = all(
-        isinstance(a, str) and a.strip().lower() in AUTHOR_STUBS
-        for a in authors
+        isinstance(a, str) and a.strip().lower() in AUTHOR_STUBS for a in authors
     )
     if all_authors_stub:
         return False
@@ -720,13 +719,13 @@ def print_pdf_results_table(
         title_raw = data.get("title")
         if title_raw is None:
             title_raw = ""
-        title = (title_raw[:37] + "..." if len(title_raw) > 40 else title_raw)
+        title = title_raw[:37] + "..." if len(title_raw) > 40 else title_raw
 
         authors_raw = data.get("authors")
         if authors_raw is None:
             authors_raw = []
         authors_str = ", ".join(authors_raw)
-        authors = (authors_str[:27] + "..." if len(authors_str) > 30 else authors_str)
+        authors = authors_str[:27] + "..." if len(authors_str) > 30 else authors_str
 
         pages_raw = data.get("pages")
         pages = str(pages_raw) if pages_raw is not None else "—"

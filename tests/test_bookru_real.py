@@ -3,7 +3,8 @@
 """Проверка скрапинга book.ru по ISBN 9785406097656."""
 
 import sys
-sys.path.insert(0, '.')
+
+sys.path.insert(0, ".")
 
 from config import ScraperConfig
 from scraper import search_multiple_books
@@ -36,7 +37,9 @@ if __name__ == "__main__":
     print("Результаты:")
     for i, res in enumerate(results):
         if res:
-            print(f"  Найдено: {res.get('title')}, автор(ы): {res.get('authors')}, страницы: {res.get('pages')}, год: {res.get('year')}, источник: {res.get('source')}")
+            print(
+                f"  Найдено: {res.get('title')}, автор(ы): {res.get('authors')}, страницы: {res.get('pages')}, год: {res.get('year')}, источник: {res.get('source')}"
+            )
         else:
             print("  Не найдено.")
     sys.exit(0)

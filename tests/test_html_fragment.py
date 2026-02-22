@@ -5,6 +5,7 @@ Unit-тесты для модуля html_fragment.py.
 
 import sys
 import os
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bs4 import BeautifulSoup
@@ -207,7 +208,9 @@ class TestExtractCommonParentHtml:
 
     def test_label_and_value_in_same_text_node(self):
         html = "<div>Год издания: 2020</div>"
-        fragments = extract_common_parent_html(html, "Год издания", "2020", exact_label=False, exact_value=False)
+        fragments = extract_common_parent_html(
+            html, "Год издания", "2020", exact_label=False, exact_value=False
+        )
         # Оба текста внутри одного текстового узла, их родитель – <div>
         assert len(fragments) == 1
         frag = fragments[0]

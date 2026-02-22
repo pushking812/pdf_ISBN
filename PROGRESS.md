@@ -127,3 +127,12 @@
 
 ---
 *Обновлено: 2026‑02‑22*[2026-02-22 15:37] - Исправлен парсинг РГБ в debug_selectors.py: добавлен fallback извлечения значений по паттерну, если фрагменты не найдены; обновлены тестовые данные и параметр exact по умолчанию для улучшения работы с табличной структурой (файлы: debug_selectors.py, html_fragment.py)
+
+[2026-02-22 18:19] - Завершена Итерация 1 исправлений из TODO.md (файлы: debug_selectors.py, html_fragment.py, CONCEPTION.md)
+  - Исправлен критичный баг в run_parse (формат пары в не‑test режиме)
+  - Добавлены timeout в requests (html_fragment.extract_common_parent_from_url, debug_selectors.run_search)
+  - Уточнено поведение extract_value (удалён вводящий 'pass')
+  - Исправлены аннотации типов в тестовых данных и generate_pattern
+  - Обновлена документация в CONCEPTION.md
+[2026-02-22 18:27] - Завершение невыполненных пунктов Итерации 1: исправлены аннотации типов в generate_pattern, добавлены timeout в сетевые вызовы, уточнено поведение extract_value (файлы: debug_selectors.py, html_fragment.py)
+[2026-02-22 18:49] - Обработка исключений при поиске отсутствующих полей: добавлена проверка на пустые фрагменты в generate_pattern и run_parse, предотвращено IndexError (файлы: debug_selectors.py)

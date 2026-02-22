@@ -2,28 +2,27 @@
 """
 Тестирование исправлений на примере пользователя.
 """
+
 import sys
-sys.path.insert(0, '.')
+
+sys.path.insert(0, ".")
 
 from debug_selectors import generate_pattern, extract_value
 import argparse
 
 # Создаём объект аргументов с нужными параметрами
 args = argparse.Namespace(
-    search_mode='element',
-    exact=False,
-    case_sensitive=False,
-    verbose=True
+    search_mode="element", exact=False, case_sensitive=False, verbose=True
 )
 
 # Фрагмент, аналогичный предоставленному пользователем (только h1 и span)
-html_fragment = '''
+html_fragment = """
 <h1 class="book_PageTitle__2I49f" itemprop="name">Многомерный анализ данных на Python</h1>
 <span>Какой-то дополнительный текст</span>
-'''
+"""
 
 parse_frags = [
-    ('https://example.com', '', 'Многомерный анализ данных на Python', [html_fragment])
+    ("https://example.com", "", "Многомерный анализ данных на Python", [html_fragment])
 ]
 
 print("=== Генерация паттерна для примера пользователя ===")
@@ -52,4 +51,5 @@ try:
 except Exception as e:
     print(f"Ошибка извлечения: {e}")
     import traceback
+
     traceback.print_exc()

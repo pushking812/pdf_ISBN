@@ -58,22 +58,24 @@ def _book_ru_resource() -> Dict[str, Any]:
     def custom_parser(driver, resource):
         import json
         from bs4 import BeautifulSoup
-        
+
         soup = BeautifulSoup(driver.page_source, "lxml")
-        
+
         # Проверка на страницу "ничего не найдено"
         no_product_phrases = resource.get("no_product_phrases", [])
         page_text = soup.get_text().lower()
         if any(phrase.lower() in page_text for phrase in no_product_phrases if phrase):
             return None
-        
+
         # Пытаемся извлечь данные из JSON скрипта __NEXT_DATA__
         script = soup.find("script", id="__NEXT_DATA__")
         if script:
             try:
                 data = json.loads(script.string)
                 # Путь к данным книги
-                server_data = data.get("props", {}).get("pageProps", {}).get("serverDataBook", {})
+                server_data = (
+                    data.get("props", {}).get("pageProps", {}).get("serverDataBook", {})
+                )
                 if server_data.get("result") == 1:
                     items = server_data.get("item", [])
                     if items:
@@ -92,7 +94,7 @@ def _book_ru_resource() -> Dict[str, Any]:
                         # Если ISBN не найден, можно использовать EAN
                         if not isbn:
                             isbn = book.get("ean", "").strip()
-                        
+
                         return {
                             "title": title or "Не удалось определить название",
                             "authors": authors or ["Неизвестный автор"],
@@ -109,7 +111,7 @@ def _book_ru_resource() -> Dict[str, Any]:
                     return None
             except (json.JSONDecodeError, KeyError, IndexError):
                 pass  # Проваливаемся на стандартный парсер
-        
+
         # Fallback: стандартный парсинг через селекторы
         title = None
         for sel in resource.get("title_selectors", []):
@@ -120,36 +122,44 @@ def _book_ru_resource() -> Dict[str, Any]:
                 else:
                     title = elem.get_text(strip=True)
                 break
-        
+
         authors = []
         for sel in resource.get("author_selectors", []):
             elems = soup.select(sel)
             if elems:
-                authors = [a.get_text(strip=True) for a in elems if a.get_text(strip=True)]
+                authors = [
+                    a.get_text(strip=True) for a in elems if a.get_text(strip=True)
+                ]
                 break
-        
+
         pages = None
         for sel in resource.get("pages_selectors", []):
             elem = soup.select_one(sel)
             if elem:
                 pages = elem.get_text(strip=True)
                 break
-        
+
         year = None
         for sel in resource.get("year_selectors", []):
             elem = soup.select_one(sel)
             if elem:
                 year = elem.get_text(strip=True)
                 break
-        
+
         # Дополнительный поиск в свойствах
         if resource.get("properties_item_class"):
             for li in soup.find_all("li", class_=resource["properties_item_class"]):
-                title_elem = li.find("span", class_=resource.get("properties_title_class", ""))
-                content_elem = li.find("span", class_=resource.get("properties_content_class", ""))
+                title_elem = li.find(
+                    "span", class_=resource.get("properties_title_class", "")
+                )
+                content_elem = li.find(
+                    "span", class_=resource.get("properties_content_class", "")
+                )
                 if title_elem and content_elem:
                     text = title_elem.get_text(strip=True).lower()
-                    if not pages and ("страниц" in text or "стр." in text or "объем" in text):
+                    if not pages and (
+                        "страниц" in text or "стр." in text or "объем" in text
+                    ):
                         pages = content_elem.get_text(strip=True)
                     if not year and "год" in text:
                         year_span = content_elem.find("span", itemprop="copyrightYear")
@@ -157,7 +167,7 @@ def _book_ru_resource() -> Dict[str, Any]:
                             year = year_span.get_text(strip=True)
                         else:
                             year = content_elem.get_text(strip=True)
-        
+
         return {
             "title": title or "Не удалось определить название",
             "authors": authors or ["Неизвестный автор"],
@@ -205,7 +215,7 @@ def _rsl_resource() -> Dict[str, Any]:
         from bs4 import BeautifulSoup
 
         soup = BeautifulSoup(driver.page_source, "lxml")
-        
+
         # Поиск таблицы с описанием книги
         table = soup.find("table", class_="card-descr-table")
         if not table:
@@ -219,14 +229,14 @@ def _rsl_resource() -> Dict[str, Any]:
                 "url": driver.current_url,
                 "source": resource.get("source_label", "РГБ"),
             }
-        
+
         # Инициализируем переменные
         title = None
         authors = []
         pages = None
         year = None
         isbn = None
-        
+
         # Проходим по строкам таблицы
         for row in table.find_all("tr"):
             th = row.find("th")
@@ -235,7 +245,7 @@ def _rsl_resource() -> Dict[str, Any]:
                 continue
             header = th.get_text(strip=True)
             value = td.get_text(strip=True)
-            
+
             if header == "Автор":
                 authors = [value]
             elif header == "Заглавие":
@@ -261,19 +271,19 @@ def _rsl_resource() -> Dict[str, Any]:
                     year_match = re.search(r"(\d{4})", value)
                     if year_match:
                         year = year_match.group(1)
-        
+
         # Если название не найдено, пытаемся получить из тега h1 или другого селектора
         if not title:
             h1 = soup.find("h1")
             if h1:
                 title = h1.get_text(strip=True)
-        
+
         # Если авторы не найдены, пытаемся найти по другим селекторам
         if not authors:
             author_elem = soup.find("b", class_="js-item-authorinfo")
             if author_elem:
                 authors = [author_elem.get_text(strip=True).rstrip(".")]
-        
+
         return {
             "title": title or "Не удалось определить название",
             "authors": authors or ["Неизвестный автор"],
@@ -322,21 +332,23 @@ def get_scraper_resources(config: ScraperConfig) -> List[Dict[str, Any]]:
     ]
 
 
-def get_resource_by_url(url: str, config: ScraperConfig = None) -> Optional[Dict[str, Any]]:
+def get_resource_by_url(
+    url: str, config: ScraperConfig = None
+) -> Optional[Dict[str, Any]]:
     """
     Возвращает ресурс (словарь с селекторами), соответствующий переданному URL.
     Если конфиг не передан, создаётся конфиг по умолчанию.
     """
-    from urllib.parse import urlparse
-    
+
     if config is None:
         from config import ScraperConfig
+
         config = ScraperConfig()
-    
+
     resources = get_scraper_resources(config)
     parsed_url = urlparse(url)
     url_domain = parsed_url.netloc.lower()
-    
+
     for resource in resources:
         resource_url = resource.get("base_url")
         if not resource_url:
@@ -344,10 +356,10 @@ def get_resource_by_url(url: str, config: ScraperConfig = None) -> Optional[Dict
         parsed_resource = urlparse(resource_url)
         resource_domain = parsed_resource.netloc.lower()
         # Сравниваем домены (можно также учитывать поддомены)
-        if url_domain == resource_domain or url_domain.endswith('.' + resource_domain):
+        if url_domain == resource_domain or url_domain.endswith("." + resource_domain):
             return resource
         # Дополнительно проверяем, содержит ли URL базовый URL (для учёта пути)
         if url.startswith(resource_url):
             return resource
-    
+
     return None
