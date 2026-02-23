@@ -1,0 +1,51 @@
+{
+  "resources": [
+    {
+      "id": "chitai_gorod",
+      "name": "Читай-город",
+      "type": "web",
+      "base_url": "https://www.chitai-gorod.ru",
+      "search_url_template": "https://www.chitai-gorod.ru/search?phrase={isbn}",
+      "requires_browser": true,
+      "selectors": [],
+      "delay_range": [
+        1.0,
+        3.0
+      ],
+      "max_retries": 3,
+      "timeout": 30
+    },
+    {
+      "id": "book_ru",
+      "name": "Book.ru",
+      "type": "web",
+      "base_url": "https://book.ru",
+      "search_url_template": "https://book.ru/search?q={isbn}",
+      "requires_browser": true,
+      "selectors": [],
+      "delay_range": [
+        1.0,
+        3.0
+      ],
+      "max_retries": 3,
+      "timeout": 30,
+      "custom_parser": "book_ru_table_parser"
+    },
+    {
+      "id": "rsl",
+      "name": "РГБ (Российская государственная библиотека)",
+      "type": "table",
+      "base_url": "https://search.rsl.ru",
+      "search_url_template": "https://search.rsl.ru/ru/search?q={isbn}",
+      "requires_browser": false,
+      "selectors": [],
+      "delay_range": [
+        2.0,
+        5.0
+      ],
+      "max_retries": 2,
+      "timeout": 45,
+      "table_selector": "table.search-results"
+    }
+  ]
+}

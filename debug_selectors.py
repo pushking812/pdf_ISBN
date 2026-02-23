@@ -28,90 +28,257 @@ from html_fragment import (
     find_elements_by_text,
     find_text_nodes,
     lowest_common_ancestor,
+    DEFAULT_HEADERS,
 )
 from bs4 import BeautifulSoup, Tag
 from typing import Dict, Any, Union, Iterable, Tuple, List
 from resources import get_resource_by_url
 from config import ScraperConfig
 
+# Константы для case-insensitive поиска в XPath
+ENGLISH_UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+ENGLISH_LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
+RUSSIAN_UPPERCASE = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+RUSSIAN_LOWERCASE = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+
+# Комбинированные строки для translate()
+ALL_UPPERCASE = ENGLISH_UPPERCASE + RUSSIAN_UPPERCASE
+ALL_LOWERCASE = ENGLISH_LOWERCASE + RUSSIAN_LOWERCASE
+
+# Уровни логирования
+LOG_LEVELS = {
+    "error": 0,
+    "warn": 1,
+    "info": 2,
+    "debug": 3,
+}
+
+
+def log_message(
+    level: str, message: str, args: Optional[argparse.Namespace] = None
+) -> None:
+    """
+    Выводит сообщение с учетом уровня логирования.
+
+    Args:
+        level: Уровень сообщения (error, warn, info, debug)
+        message: Текст сообщения
+        args: Аргументы командной строки (для определения текущего уровня логирования)
+    """
+    if args is None:
+        # Если args не переданы, выводим все сообщения
+        print(f"[{level.upper()}] {message}")
+        return
+
+    # Определяем текущий уровень логирования из args
+    current_level = getattr(args, "log_level", "info")
+    current_level_num = LOG_LEVELS.get(current_level, 2)  # По умолчанию info
+
+    # Определяем уровень сообщения
+    message_level_num = LOG_LEVELS.get(level, 2)
+
+    # Выводим сообщение только если его уровень <= текущему уровню логирования
+    if message_level_num <= current_level_num:
+        print(f"[{level.upper()}] {message}")
+
+
+def compact_xpath_expression(xpath: str, max_length: int = 100) -> str:
+    """
+    Сокращает длинные XPath выражения для более компактного вывода.
+
+    Args:
+        xpath: Исходное XPath выражение
+        max_length: Максимальная длина выводимой строки
+
+    Returns:
+        Сокращенное XPath выражение
+    """
+    import re
+
+    # Простая замена: находим любые строки в кавычках длиннее 10 символов
+    # и заменяем их на первые 3 символа + "..."
+    def replace_long_string(match):
+        s = match.group(2)  # содержимое строки без кавычек (group 2)
+        if len(s) > 10:
+            # Сохраняем оригинальные кавычки (group 1)
+            return match.group(1) + s[:3] + "..." + match.group(1)
+        return match.group(0)
+
+    # Паттерн для поиска строк в одинарных или двойных кавычках
+    # Группа 1: кавычка, Группа 2: содержимое
+    string_pattern = r"(['\"])([^\"']{10,})\1"
+
+    # Применяем замену
+    compacted = re.sub(string_pattern, replace_long_string, xpath)
+
+    # Если все еще слишком длинное, обрезаем всю строку
+    if len(compacted) > max_length:
+        compacted = compacted[:max_length] + "..."
+
+    return compacted
+
 
 def parse_arguments(
-    url: str,
-    label: str,
-    value: str,
-    selenium: bool,
-    exact: bool,
-    verbose: bool,
-    test: bool,
-    search_mode: str,
-    case_sensitive: bool = False,
-    all_matches: bool = False,
+    defaults: Optional[Dict[str, Any]] = None,
+    test_mode_defaults: Optional[Dict[str, Any]] = None,
 ) -> argparse.Namespace:
-    """Парсит аргументы командной строки и возвращает объект с ними."""
+    """
+    Парсит аргументы командной строки.
+
+    Args:
+        defaults: Значения по умолчанию для обычного режима (без --test)
+        test_mode_defaults: Значения по умолчанию для тестового режима (с --test)
+
+    Приоритеты применения значений:
+    1. Аргументы командной строки
+    2. Значения из соответствующего словаря defaults (в зависимости от флага --test)
+    3. Hardcoded значения по умолчанию
+
+    Возвращает объект argparse.Namespace с аргументами.
+    """
+    # Hardcoded значения по умолчанию (базовые)
+    hardcoded_defaults = {
+        "url": "",
+        "label": "",
+        "value": "",
+        "selenium": False,
+        "exact": False,
+        "verbose": False,
+        "test": False,
+        "search_mode": "text",
+        "case_sensitive": False,
+        "all_matches": False,
+        "attribute": "auto",  # auto, text, href, src, content
+        "max_html_length": 500,  # Максимальная длина выводимого HTML
+        "log_level": "info",  # Уровень логирования: error, warn, info, debug
+        "compact_output": False,  # Компактный режим вывода
+    }
+
+    # Определяем, какие defaults использовать
+    effective_defaults = hardcoded_defaults.copy()
+
+    # Сначала применяем обычные defaults (если переданы)
+    if defaults:
+        for key, value in defaults.items():
+            if key in effective_defaults:
+                effective_defaults[key] = value
+
+    # Затем применяем test_mode_defaults (если переданы)
+    # Они будут использоваться только если в командной строке указан --test
+    # или если test=True в defaults
+    test_defaults = {}
+    if test_mode_defaults:
+        test_defaults = test_mode_defaults
+
     parser = argparse.ArgumentParser(
         description="Извлечение HTML-фрагментов по паре «название поля – значение»."
     )
+
+    # Позиционные аргументы
     parser.add_argument(
         "url",
         help="URL страницы",
         nargs="?",
-        default=url,
+        default=effective_defaults["url"],
     )
     parser.add_argument(
         "label",
         help="Текст названия поля (например, 'Год издания')",
         nargs="?",
-        default=label,
+        default=effective_defaults["label"],
     )
     parser.add_argument(
         "value",
         help="Текст значения поля (например, '2020')",
         nargs="?",
-        default=value,
+        default=effective_defaults["value"],
     )
+
+    # Флаги
     parser.add_argument(
         "--selenium",
         action="store_true",
         help="Использовать Selenium WebDriver (для динамических страниц)",
-        default=selenium,
+        default=effective_defaults["selenium"],
     )
     parser.add_argument(
         "--exact",
         action="store_true",
         help="Точное совпадение текстов (по умолчанию – частичное)",
-        default=exact,
+        default=effective_defaults["exact"],
     )
     parser.add_argument(
         "--case-sensitive",
         action="store_true",
         help="Учитывать регистр (по умолчанию – нет)",
-        default=case_sensitive,
+        default=effective_defaults["case_sensitive"],
     )
     parser.add_argument(
         "--all-matches",
         action="store_true",
         help="Показать все найденные фрагменты (по умолчанию – только первый)",
-        default=all_matches,
+        default=effective_defaults["all_matches"],
     )
     parser.add_argument(
         "--verbose",
         action="store_true",
         help="Выводить отладочную информацию",
-        default=verbose,
+        default=effective_defaults["verbose"],
     )
     parser.add_argument(
         "--test",
         action="store_true",
         help="Использовать тестовый набор данных (жёстко закодированные URL и пары)",
-        default=test,
+        default=effective_defaults["test"],
     )
     parser.add_argument(
         "--search-mode",
         choices=["text", "element"],
-        default=search_mode,
-        help="Режим поиска узлов: text (по текстовым узлам), element (по элементам с полным текстом)",
+        default=effective_defaults["search_mode"],
+        help="Режим поиска узлов: text (по текстовым узлах), element (по элементам с полным текстом)",
     )
-    return parser.parse_args()
+    parser.add_argument(
+        "--attribute",
+        choices=["auto", "text", "href", "src", "content"],
+        default=effective_defaults["attribute"],
+        help="Атрибут для извлечения значения: auto (автоматический выбор), text (текст элемента), href (ссылка), src (изображение), content (meta-тег)",
+    )
+
+    # Новые аргументы для контроля вывода
+    parser.add_argument(
+        "--max-html-length",
+        type=int,
+        default=effective_defaults["max_html_length"],
+        help=f"Максимальная длина выводимого HTML (по умолчанию: {effective_defaults['max_html_length']})",
+    )
+
+    parser.add_argument(
+        "--log-level",
+        choices=["error", "warn", "info", "debug"],
+        default=effective_defaults["log_level"],
+        help="Уровень детализации вывода: error (только ошибки), warn (предупреждения), info (основная информация), debug (детальная отладка)",
+    )
+
+    parser.add_argument(
+        "--compact-output",
+        action="store_true",
+        default=effective_defaults["compact_output"],
+        help="Компактный режим вывода (сокращает длинные сообщения и XPath выражения)",
+    )
+
+    # Парсим аргументы
+    args = parser.parse_args()
+
+    # Если установлен флаг --test и есть test_mode_defaults, применяем их
+    # (переопределяем значения, которые могли быть установлены через defaults)
+    if args.test and test_defaults:
+        for key, value in test_defaults.items():
+            if hasattr(args, key) and getattr(args, key) == effective_defaults.get(key):
+                # Применяем test_mode_defaults только если значение не было переопределено
+                # через командную строку (т.е. равно значению из effective_defaults)
+                setattr(args, key, value)
+
+    return args
 
 
 def get_test_data_to_parse() -> dict[str, list[dict[str, str]]]:
@@ -309,14 +476,14 @@ def generate_pattern(
             else:
                 # Точное совпадение без учёта регистра
                 # Используем translate для приведения к нижнему регистру (английские и русские буквы)
-                return f"translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('{escaped_text}', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')"
+                return f"translate(normalize-space(.), '{ALL_UPPERCASE}', '{ALL_LOWERCASE}') = translate('{escaped_text}', '{ALL_UPPERCASE}', '{ALL_LOWERCASE}')"
         else:
             if case_sensitive:
                 # Частичное совпадение с учётом регистра
                 return f"contains(., '{escaped_text}')"
             else:
                 # Частичное совпадение без учёта регистра
-                return f"contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя'), translate('{escaped_text}', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя'))"
+                return f"contains(translate(., '{ALL_UPPERCASE}', '{ALL_LOWERCASE}'), translate('{escaped_text}', '{ALL_UPPERCASE}', '{ALL_LOWERCASE}'))"
 
     def get_deepest_node(nodes):
         if not nodes:
@@ -475,21 +642,29 @@ def generate_pattern(
             raise ValueError("Не удалось найти общего предка для label и value")
 
         # Определяем атрибут для извлечения
-        attribute = "text"
-        if isinstance(value_node, Tag):
-            if value_node.name == "a":
-                # Для пустого label предпочтительнее текст, если он совпадает с искомым значением
-                if label_text == "" and value_node.get_text(strip=True) == value_text:
-                    attribute = "text"
-                else:
-                    attribute = "href"
-            elif value_node.has_attr("src"):
-                attribute = "src"
-            elif value_node.has_attr("content"):
-                attribute = "content"
+        # Если указан явный атрибут в аргументах, используем его
+        if hasattr(args, "attribute") and args.attribute != "auto":
+            attribute = args.attribute
+        else:
+            # Автоматический выбор атрибута
+            attribute = "text"
+            if isinstance(value_node, Tag):
+                if value_node.name == "a":
+                    # Для пустого label предпочтительнее текст, если он совпадает с искомым значением
+                    if (
+                        label_text == ""
+                        and value_node.get_text(strip=True) == value_text
+                    ):
+                        attribute = "text"
+                    else:
+                        attribute = "href"
+                elif value_node.has_attr("src"):
+                    attribute = "src"
+                elif value_node.has_attr("content"):
+                    attribute = "content"
 
         # Пытаемся построить CSS-селектор по уникальному классу или id
-        def get_css_selector(element: Tag) -> str:
+        def get_css_selector(element: Tag, ancestor: Optional[Tag] = None) -> str:
             # Если есть id – используем его
             if element.has_attr("id"):
                 return f"#{element['id']}"
@@ -500,16 +675,23 @@ def generate_pattern(
                     classes = classes.split()
                 if isinstance(classes, list):
                     for cls in classes:
-                        # Проверяем, что этот класс встречается только у данного элемента в soup
-                        if len(soup.select(f".{cls}")) == 1:
-                            return f".{cls}"
+                        # Проверяем уникальность класса в пределах ancestor (если передан) или всего документа
+                        if ancestor is not None:
+                            # Ищем элементы с этим классом внутри ancestor
+                            elements_in_ancestor = ancestor.select(f".{cls}")
+                            if len(elements_in_ancestor) == 1:
+                                return f".{cls}"
+                        else:
+                            # Старая логика: проверяем во всем документе
+                            if len(soup.select(f".{cls}")) == 1:
+                                return f".{cls}"
             # Иначе селектор по тегу с учётом родительской структуры (упрощённо)
             # Пока вернём пустую строку, чтобы переключиться на XPath
             return ""
 
         css_selector = ""
         if isinstance(value_node, Tag):
-            css_selector = get_css_selector(value_node)
+            css_selector = get_css_selector(value_node, ancestor)
 
         if css_selector:
             # Проверим, что селектор уникально выбирает value внутри ancestor
@@ -592,8 +774,15 @@ def generate_pattern(
                 "resource_id": resource.get("id") if resource else None,
             }
 
+        # Компактизируем XPath для вывода
+        selector_display = pattern["selector"]
+        if pattern["type"] == "xpath" and len(selector_display) > 100:
+            selector_display = compact_xpath_expression(
+                selector_display, max_length=100
+            )
+
         print(
-            f"Сгенерирован паттерн: {pattern['type']} -> {pattern['selector']} (атрибут: {pattern['attribute']})"
+            f"Сгенерирован паттерн: {pattern['type']} -> {selector_display} (атрибут: {pattern['attribute']})"
         )
 
         patterns.append(pattern)
@@ -699,17 +888,53 @@ def extract_value(
     return value.strip() if isinstance(value, str) else str(value)
 
 
-def print_fragments(fragments: list[tuple]) -> None:
-    """Выводит найденные фрагменты в консоль."""
+def print_fragments(fragments: list[tuple], max_html_length: int = 500) -> None:
+    """
+    Выводит найденные фрагменты в консоль с ограничением длины HTML.
+
+    Args:
+        fragments: Список фрагментов в формате (url, label, value, html, resource)
+        max_html_length: Максимальная длина выводимого HTML (по умолчанию 500 символов)
+    """
     if not fragments:
         print("❌ Фрагменты не найдены.")
         return
+
     print(f"Найдено фрагментов: {len(fragments)}")
+
     for i, frag in enumerate(fragments, 1):
         print(f"\n=== Фрагмент {i} ===")
         print(f"URL: {frag[0]}, Label: '{frag[1]}', Value: '{frag[2]}'")
         print("-" * 50)
-        print(frag[3])
+
+        # Получаем HTML фрагмент (может быть строкой или списком строк)
+        html_fragment = frag[3] if len(frag) > 3 else ""
+
+        # Обрабатываем в зависимости от типа
+        if isinstance(html_fragment, list):
+            # Если это список фрагментов
+            for j, html_item in enumerate(html_fragment):
+                if j > 0:
+                    print(f"\n--- Подфрагмент {j + 1} ---")
+
+                # Ограничиваем вывод каждого HTML элемента
+                if html_item and len(html_item) > max_html_length:
+                    truncated_html = html_item[:max_html_length]
+                    print(
+                        f"{truncated_html}\n... [HTML обрезан, длина: {len(html_item)} символов]"
+                    )
+                else:
+                    print(html_item)
+        else:
+            # Если это одиночная строка
+            if html_fragment and len(html_fragment) > max_html_length:
+                truncated_html = html_fragment[:max_html_length]
+                print(
+                    f"{truncated_html}\n... [HTML обрезан, длина: {len(html_fragment)} символов]"
+                )
+            else:
+                print(html_fragment)
+
         print("=" * 50)
 
 
@@ -731,18 +956,18 @@ def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
         driver_created = True
     try:
         for url, pairs in search_data.items():
-            if args.verbose:
-                print(f"\n🔍 Проверка URL: {url}")
+            log_message("info", f"🔍 Проверка URL: {url}", args)
 
             if driver:
                 driver.get(url)
                 wait_for_page_with_protection(driver)
 
             for pair in pairs:
-                if args.verbose:
-                    print(
-                        f"\n=== Поиск пары: '{pair['label']}' – '{pair['value']}' ==="
-                    )
+                log_message(
+                    "debug",
+                    f"=== Поиск пары: '{pair['label']}' – '{pair['value']}' ===",
+                    args,
+                )
 
                 fragments = search_web(
                     url,
@@ -764,23 +989,27 @@ def run_parse(args: argparse.Namespace, driver=None) -> Union[bool, list[str]]:
                         [(url, pair["label"], pair["value"], fragments, resource)]
                     )
                 else:
-                    if args.verbose:
-                        print(
-                            f"[WARN] Для пары '{pair['label']}' - '{pair['value']}' фрагменты не найдены"
-                        )
+                    log_message(
+                        "warn",
+                        f"Для пары '{pair['label']}' - '{pair['value']}' фрагменты не найдены",
+                        args,
+                    )
     finally:
         if driver_created and driver:
             driver.quit()
 
     if not all_fragments:
-        print("❌ Фрагменты не найдены.")
-        if not args.verbose:
-            print(
-                "💡 Попробуйте запустить с параметром --verbose, чтобы увидеть отладочную информацию."
-            )
+        log_message("error", "❌ Фрагменты не найдены.", args)
+        log_message(
+            "info",
+            "💡 Попробуйте запустить с параметром --log-level=debug, чтобы увидеть отладочную информацию.",
+            args,
+        )
         return False
 
-    print_fragments(all_fragments)  # html фрагменты для первой пары (для наглядности)
+    print_fragments(
+        all_fragments, max_html_length=args.max_html_length
+    )  # html фрагменты для первой пары (для наглядности)
     return all_fragments
 
 
@@ -822,10 +1051,11 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
 
         Приоритет поиска:
         1. Точное совпадение по (resource_id, label, value)
-        2. Совпадение по (resource_id, label) (value может отличаться)
-        3. Совпадение по (resource_id) (только resource_id)
-        4. Любой паттерн без resource_id с совпадением label/value
-        5. Первый доступный паттерн
+        2. Совпадение по (resource_id, label) (value любое)
+        3. Для пустых label: совпадение по resource_id и частичное совпадение по value
+        4. Совпадение только по resource_id
+        5. Любой паттерн без resource_id с совпадением label/value
+        6. Первый доступный паттерн
         """
         # 1. Точное совпадение
         exact_key = (resource_id, label, value)
@@ -838,17 +1068,35 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                 if key[0] == resource_id and key[1] == label:
                     return pat
 
-        # 3. Совпадение только по resource_id
+        # 3. Для пустых label: ищем паттерн с тем же resource_id и похожим значением
+        if not label and resource_id and resource_id in patterns_by_resource:
+            # Ищем паттерны с пустым label и похожим значением
+            for pat in patterns_by_resource[resource_id]:
+                if pat.get("label_text") == "":
+                    # Проверяем, есть ли общие слова в значениях
+                    pattern_value = pat.get("value_text", "").lower()
+                    current_value = value.lower()
+                    # Если значения содержат общие ключевые слова (например, "Python")
+                    if "python" in pattern_value and "python" in current_value:
+                        return pat
+                    # Или если значения имеют схожую структуру
+                    if len(pattern_value) > 10 and len(current_value) > 10:
+                        # Простая проверка на схожесть по первым словам
+                        pattern_words = pattern_value.split()[:3]
+                        if any(word in current_value for word in pattern_words):
+                            return pat
+
+        # 4. Совпадение только по resource_id
         if resource_id and resource_id in patterns_by_resource:
             # Возвращаем первый паттерн для этого ресурса
             return patterns_by_resource[resource_id][0]
 
-        # 4. Паттерны без resource_id с совпадением label/value
+        # 5. Паттерны без resource_id с совпадением label/value
         for pat in patterns_without_resource:
             if pat.get("label_text") == label and pat.get("value_text") == value:
                 return pat
 
-        # 5. Первый доступный паттерн
+        # 6. Первый доступный паттерн
         if available_patterns:
             return available_patterns[0]
 
@@ -890,8 +1138,11 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                 )
 
                 if pattern:
+                    selector_display = pattern["selector"]
+                    if pattern["type"] == "xpath":
+                        selector_display = compact_xpath_expression(selector_display)
                     print(
-                        f"[DEBUG] Используется паттерн: {pattern['type']} -> {pattern['selector']}"
+                        f"[DEBUG] Используется паттерн: {pattern['type']} -> {selector_display}"
                     )
                     print(
                         f"[DEBUG] Паттерн соответствует: label='{pattern.get('label_text')}', value='{pattern.get('value_text')}'"
@@ -917,6 +1168,24 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                     print("[WARN] Фрагменты не найдены, пропускаем")
                     # Пытаемся извлечь значение напрямую по паттерну, если он есть
                     if pattern:
+                        if args.verbose:
+                            selector_display = pattern["selector"]
+                            if pattern["type"] == "xpath":
+                                selector_display = compact_xpath_expression(
+                                    selector_display
+                                )
+                            print(
+                                f"[DEBUG extract_value] Используется паттерн: {pattern['type']} -> {selector_display}"
+                            )
+                            print(
+                                f"[DEBUG extract_value] Атрибут для извлечения: {pattern.get('attribute', 'text')}"
+                            )
+                            print(
+                                f"[DEBUG extract_value] Ожидаемое значение: '{pair['value']}'"
+                            )
+                            print(
+                                f"[DEBUG extract_value] Значение паттерна: '{pattern.get('value_text')}'"
+                            )
                         if driver is not None:
                             extracted = extract_value(driver, pattern)
                         else:
@@ -927,18 +1196,86 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
                             try:
                                 resp = requests.get(
                                     url,
-                                    headers={"User-Agent": "Mozilla/5.0"},
+                                    headers=DEFAULT_HEADERS,
                                     timeout=10,
                                 )
                                 resp.raise_for_status()
                                 extracted = extract_value(resp.text, pattern)
                             except RequestException as e:
-                                print(f"[ERROR] Не удалось загрузить страницу: {e}")
+                                log_message(
+                                    "error",
+                                    f"Не удалось загрузить страницу {url}: {e}",
+                                    args,
+                                )
                                 extracted = None
+
+                        # Fallback для пустых label: если извлечение не удалось, пробуем найти по тексту
+                        if extracted is None and not pair["label"]:
+                            if args.verbose:
+                                print(
+                                    f"[DEBUG fallback] Пытаемся найти значение '{pair['value']}' напрямую по тексту"
+                                )
+                            # Пробуем найти элемент с нужным текстом
+                            if driver is not None:
+                                try:
+                                    from selenium.webdriver.common.by import By
+
+                                    elements = driver.find_elements(
+                                        By.XPATH,
+                                        f"//*[contains(text(), '{pair['value'][:50]}')]",
+                                    )
+                                    if elements:
+                                        extracted = elements[0].text
+                                        if args.verbose:
+                                            print(
+                                                f"[DEBUG fallback] Найдено по тексту: {extracted[:100]}..."
+                                            )
+                                except Exception:
+                                    pass
                     else:
                         extracted = None
                 elif pattern:
+                    if args.verbose:
+                        selector_display = pattern["selector"]
+                        if pattern["type"] == "xpath":
+                            selector_display = compact_xpath_expression(
+                                selector_display
+                            )
+                        print(
+                            f"[DEBUG extract_value] Используется паттерн: {pattern['type']} -> {selector_display}"
+                        )
+                        print(
+                            f"[DEBUG extract_value] Атрибут для извлечения: {pattern.get('attribute', 'text')}"
+                        )
+                        print(
+                            f"[DEBUG extract_value] Ожидаемое значение: '{pair['value']}'"
+                        )
+                        print(
+                            f"[DEBUG extract_value] Значение паттерна: '{pattern.get('value_text')}'"
+                        )
                     extracted = extract_value(search_frags[0], pattern)
+
+                    # Fallback для пустых label: если извлечение не удалось, используем текст из фрагмента
+                    if extracted is None and not pair["label"] and search_frags:
+                        if args.verbose:
+                            print(
+                                "[DEBUG fallback] Извлечение по паттерну не удалось, используем текст из фрагмента"
+                            )
+                        # Пробуем извлечь текст из фрагмента напрямую
+                        try:
+                            soup = BeautifulSoup(search_frags[0], "lxml")
+                            # Ищем текст, похожий на ожидаемое значение
+                            for text in soup.stripped_strings:
+                                if pair["value"] in text or text in pair["value"]:
+                                    extracted = text
+                                    break
+                            if extracted is None and soup.text:
+                                extracted = soup.text.strip()[:200]
+                        except Exception as e:
+                            if args.verbose:
+                                print(
+                                    f"[DEBUG fallback] Ошибка при извлечении текста: {e}"
+                                )
                 else:
                     extracted = None
                     print("[ERROR] Не удалось выбрать паттерн для извлечения")
@@ -954,18 +1291,51 @@ def run_search(args, patterns, driver=None) -> list[Optional[str]]:
 
 
 def main() -> None:
-    default_arg_values = {
+    # Словарь для тестового режима (видимый для быстрой настройки)
+    test_mode_defaults = {
         "url": r"https://book.ru/book/943665",
         "label": "Год издания:",
         "value": "2022",
         "selenium": False,
         "exact": True,
         "verbose": False,
-        "test": True,
+        "test": True,  # Важно: по умолчанию test=True для удобства тестирования
         "search_mode": "element",
         "all_matches": True,
+        "case_sensitive": False,
+        "attribute": "auto",
     }
-    args = parse_arguments(**default_arg_values)
+
+    # Обычные значения по умолчанию (для режима без --test)
+    normal_defaults = {
+        "url": "",
+        "label": "",
+        "value": "",
+        "selenium": False,
+        "exact": False,
+        "verbose": False,
+        "test": False,
+        "search_mode": "text",
+        "all_matches": False,
+        "case_sensitive": False,
+        "attribute": "auto",
+    }
+
+    # Парсим аргументы с двумя словарями defaults
+    args = parse_arguments(
+        defaults=normal_defaults, test_mode_defaults=test_mode_defaults
+    )
+
+    # Если URL пустой и не установлен флаг --test, выводим справку
+    if not args.url and not args.test:
+        print(
+            "Ошибка: необходимо указать URL или использовать флаг --test для тестового режима."
+        )
+        print("Использование:")
+        print("  python debug_selectors.py [URL] [LABEL] [VALUE] [ОПЦИИ]")
+        print("  python debug_selectors.py --test [ОПЦИИ]")
+        print("\nДля подробной справки используйте --help")
+        sys.exit(1)
 
     driver = None
     if args.selenium:

@@ -142,3 +142,40 @@
   - Нормализация XPath с поддержкой normalize-space и translate для case-insensitive (функция build_xpath_text_condition)
   - Маппинг паттернов по ключам (resource_id, label, value) вместо выбора по индексу (функция find_best_pattern)
   - Обновление TODO.md с отметкой о выполнении Итерации 2
+
+[2026-02-22 19:50] - Завершена Итерация 3 исправлений из TODO.md (файлы: debug_selectors.py, CONCEPTION.md)
+  - Улучшение CLI для parse_arguments: рефакторинг с поддержкой двух словарей defaults (test_mode_defaults и normal_defaults)
+  - Параметризация выбора атрибутов: добавлен аргумент --attribute с выбором auto/text/href/src/content
+  - Унификация критериев уникальности классов: функция get_css_selector теперь принимает параметр ancestor и проверяет уникальность в пределах фрагмента
+  - Обновлена документация в CONCEPTION.md с описанием изменений Итерации 3
+[2026-02-22 20:33] - Исправление регрессии извлечения значений без названия поля (Итерация 4). Улучшена логика выбора паттерна для пустых label, добавлен fallback-механизм извлечения. (файлы: debug_selectors.py, TODO.md, CONCEPTION.md)
+
+[2026-02-22 21:18] - Оптимизация отладочного вывода: замена безымянных констант на именованные, добавление функции compact_xpath_expression для сокращения длинных XPath выражений, обновление всех мест вывода паттернов, добавление параметров командной строки --max-html-length, --log-level, --compact-output (файлы: debug_selectors.py, TODO.md)
+
+[2026-02-22 21:47] - Завершение Итерации 5 (оптимизация отладочного вывода) и начало Итерации 6 (обработка исключений). Обновление TODO.md, добавление обработки RequestException в html_fragment.py, улучшение обработки ошибок в debug_selectors.py, обновление CONCEPTION.md (файлы: TODO.md, html_fragment.py, debug_selectors.py, CONCEPTION.md)
+
+[2026-02-22 21:50] - Завершение Итерации 6 (обработка исключений). Выполнены задачи: обработка RequestException в html_fragment.extract_common_parent_from_url, улучшение обработки ошибок в debug_selectors.run_search (использование log_message и DEFAULT_HEADERS), обновление TODO.md и CONCEPTION.md, тестирование компиляции кода. (файлы: html_fragment.py, debug_selectors.py, TODO.md, CONCEPTION.md)
+[2026-02-22 23:55] - Завершена Итерация 2: Интеграция debug_selectors и html_fragment. Созданы классы SelectorClient и SelectorIntegration, интегрирующие функционал debug_selectors.py и html_fragment.py в новую архитектуру. Исправлены баги с дублированием селекторов. Все тесты проходят.
+  
+"[2026-02-22 21:08] - Завершена интеграция debug_selectors в новую архитектуру оркестратора. Создана модульная система с обработчиками ресурсов, конфигурацией JSON и обратной совместимостью. (файлы: scraper_core/, scraper.py, tests/test_orchestrator_integration.py, MIGRATION_GUIDE.md)" 
+
+[2026-02-22 21:37] - Реализация SearchCoordinator для оптимизации выбора ресурсов (Итерация A). Создан класс SearchCoordinator с приоритизацией ресурсов на основе статистики успешности, балансировкой нагрузки и управлением статусами. Интегрирован с ScraperOrchestrator. Написаны тесты (18 тестов). (файлы: scraper_core/orchestrator/search.py, scraper_core/orchestrator/core.py, tests/test_search_coordinator.py)
+
+[2026-02-22 22:22] - Завершение Итерации A: Реализация LinkCollector и интеграция с WebResourceHandler. Создан класс LinkCollector для извлечения, валидации и кеширования ссылок на продукты. Интегрирован с WebResourceHandler (добавлен метод fetch_page). Исправлены ошибки интеграции, написаны тесты, создана документация API. Обновлен TODO.md. (файлы: scraper_core/orchestrator/links.py, scraper_core/handlers/web_handler.py, tests/test_link_collector.py, docs/link_collector_api.md, TODO.md)
+
+[2026-02-22 22:44] - Подготовка структуры для будущего расширения TaskQueue с заглушками. Создан план архитектуры (plans/task_queue_structure.md) для расширяемой очереди задач. Обновлен TODO.md: задачи по продвинутой очереди приоритетов перемещены в конец, добавлены задачи по созданию интерфейса TaskQueueInterface и интеграции. Обновлен CONCEPTION.md с информацией о новой структуре. (файлы: plans/task_queue_structure.md, TODO.md, CONCEPTION.md)
+[2026-02-22 22:54] - Реализация TabManager для управления вкладками браузера (файлы: scraper_core/orchestrator/tabs.py, tests/test_tab_manager.py, plans/tabmanager_interaction_schema.md)
+[2026-02-22 22:58] - Обновлен TODO.md: скорректирован прогресс выполнения Итерации A, добавлены отложенные задачи недели 3
+[2026-02-22 23:02] - Обновлен TODO.md: удален дублирующий раздел "Прогресс выполнения", восстановлен обрезанный конец файла, добавлены итерации C и D согласно плану updated_architecture_with_details.md
+[2026-02-22 23:16] - Завершена Итерация B: Управление вкладками и обработка ошибок. Реализован RetryHandler с экспоненциальным backoff, jitter и circuit breaker. Интегрирован с WebResourceHandler и TabManager. Написаны unit-тесты. Обновлен ScraperOrchestrator для использования TabManager и RetryHandler. Создана документация API. (файлы: scraper_core/orchestrator/retry.py, scraper_core/handlers/web_handler.py, scraper_core/handlers/factory.py, scraper_core/orchestrator/core.py, tests/test_retry_handler.py, docs/retry_handler_api.md, TODO.md)
+
+[2026-02-22 23:35] - Завершение Итерации B: Управление вкладками и обработка ошибок (файлы: scraper_core/orchestrator/drivers.py, scraper_core/orchestrator/antibot.py, scraper_core/orchestrator/core.py, tests/test_driver_manager.py, tests/test_antibot_handler.py)\n  - Реализован DriverManager с интерфейсом и SimpleDriverManager с пулом драйверов\n  - Реализован AntiBotHandler с базовыми стратегиями обнаружения блокировок (CAPTCHA, rate limit, IP блокировки)\n  - Интегрированы новые компоненты в ScraperOrchestrator\n  - Созданы тесты для проверки базовой функциональности\n  - Обновлена документация (TODO.md, PROGRESS.md)
+
+[2026-02-22 23:47] - Завершена Итерация C: Интеграция и миграция. Реализован dual-write механизм для обратной совместимости со старыми кэшами. Созданы: DualWriteCacheManager для записи в isbn_data_cache.json и pdf_isbn_cache.json, интеграция с LegacyScraperAdapter, скрипты миграции данных и тестирования. Все тесты проходят успешно. (файлы: scraper_core/integration/dual_write.py, scraper_core/orchestrator/legacy_adapter.py, scripts/migrate_caches.py, scripts/test_dual_write.py, plans/iteration_c_implementation_plan.md)
+
+[2026-02-23 03:12] - Завершена интеграция TaskQueueInterface в ScraperOrchestrator и тестирование системы очередей. Созданы и успешно пройдены 13 тестов для queue.py, исправлены циклические импорты и проблемы с event loop. Все интеграционные тесты проходят успешно. (файлы: scraper_core/orchestrator/queue.py, scraper_core/orchestrator/core.py, tests/test_task_queue.py, tests/test_orchestrator_integration.py)
+
+[2026-02-23 03:25] - Начало недели 8 Итерации C: A/B тестирование и метрики. Создана базовая структура для параллельного запуска старой и новой системы, сборщик метрик производительности, скрипт для сравнения результатов. Подготовлена структура для расширенных метрик с заглушками. (файлы: scraper_core/integration/ab_testing.py, scraper_core/metrics/collector.py, scraper_core/metrics/advanced.py, scraper_core/metrics/__init__.py, scripts/run_ab_test.py, TODO.md)
+
+[2026-02-23 03:44] - Завершение недели 9 Итерации C: Документация и подготовка к production (файлы: docs/architecture_api.md, MIGRATION_GUIDE.md, CONCEPTION.md, examples/component_usage_examples.py, examples/README.md)\n  - Создана полная документация по API новой архитектуры\n  - Обновлено руководство по миграции с информацией о новых компонентах\n  - Обновлен CONCEPTION.md с финальной архитектурой и новой диаграммой\n  - Созданы практические примеры использования всех компонентов оркестрационного слоя\n  - Документация готова для использования разработчиками
+[2026-02-23 03:58] - Создана точка входа для реального A/B тестирования с полным пайплайном (скрипты: prepare_real_isbns.py, run_real_ab_test_fixed.py). Реализован полный цикл: извлечение ISBN из PDF в папке _books, поиск данных по ISBN на сайтах через старую и новую системы, сравнение результатов и метрик производительности. 

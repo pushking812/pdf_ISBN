@@ -305,6 +305,8 @@ def extract_common_parent_from_url(
 ) -> List[str]:
     """
     Загружает страницу по URL и извлекает фрагменты через extract_common_parent_html.
+
+    Возвращает пустой список при ошибках сети или HTTP.
     """
     if use_selenium:
         if driver is None:
@@ -326,9 +328,15 @@ def extract_common_parent_from_url(
         # Добавляем timeout по умолчанию, если не указан
         if "timeout" not in kwargs:
             kwargs["timeout"] = 10
-        response = requests.get(url, **kwargs)
-        response.raise_for_status()
-        html = response.text
+
+        try:
+            response = requests.get(url, **kwargs)
+            response.raise_for_status()
+            html = response.text
+        except requests.exceptions.RequestException as e:
+            if verbose:
+                print(f"[ERROR] Ошибка при загрузке URL {url}: {e}")
+            return []
 
     return extract_common_parent_html(
         html,

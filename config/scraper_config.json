@@ -1,0 +1,24 @@
+{
+  "max_tabs": 3,
+  "tab_timeout": 60,
+  "headless": false,
+  "user_agent": null,
+  "min_delay": 1.0,
+  "max_delay": 3.0,
+  "random_delay": true,
+  "max_retries": 3,
+  "retry_delay": 5.0,
+  "log_level": "INFO",
+  "verbose": false,
+  "config_dir": "config",
+  "cache_dir": "cache",
+  "output_dir": "output",
+  "enable_debug_selectors": true,
+  "auto_generate_selectors": true,
+  "selector_confidence_threshold": 0.7,
+  "enabled_resources": [
+    "chitai_gorod",
+    "book_ru",
+    "rsl"
+  ]
+}

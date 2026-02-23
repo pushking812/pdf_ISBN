@@ -1,0 +1,666 @@
+
+🔍 Проверка URL: https://search.rsl.ru/ru/record/01010115385
+
+=== Поиск пары: 'Автор' – 'МакГрат, Майк' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Автор': 5
+[DEBUG] Найдено узлов с value 'МакГрат, Майк': 1
+[DEBUG] Пример label узла: 'Автор'
+[DEBUG] Пример value узла: 'МакГрат, Майк'
+[DEBUG] Пара 1: label='Автор', value='МакГрат, Майк'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 2: label='Автор', value='МакГрат, Майк'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 3: label='Автор', value='МакГрат, Майк'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 4: label='Автор', value='МакГрат, Майк'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 5: label='Автор', value='МакГрат, Майк'
+[DEBUG] Добавлен фрагмент с тегом tr
+[DEBUG] Всего найдено уникальных фрагментов: 1
+
+=== Поиск пары: 'Заглавие' – 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Заглавие': 5
+[DEBUG] Найдено узлов с value 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+': 1
+[DEBUG] Пример label узла: 'Заглавие'
+[DEBUG] Пример value узла: 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной'
+[DEBUG] Пара 1: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 2: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 3: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 4: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 5: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Добавлен фрагмент с тегом tr
+[DEBUG] Всего найдено уникальных фрагментов: 1
+
+=== Поиск пары: 'Выходные данные' – 'Москва : Эксмо, 2019' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Выходные данные': 1
+[DEBUG] Найдено узлов с value 'Москва : Эксмо, 2019': 1
+[DEBUG] Пример label узла: 'Выходные данные'
+[DEBUG] Пример value узла: 'Москва : Эксмо, 2019'
+[DEBUG] Пара 1: label='Выходные данные', value='Москва : Эксмо, 2019'
+[DEBUG] Добавлен фрагмент с тегом tr
+[DEBUG] Всего найдено уникальных фрагментов: 1
+
+=== Поиск пары: 'Физическое описание' – '192 с. : ил.; 26 см' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Физическое описание': 1
+[DEBUG] Найдено узлов с value '192 с. : ил.; 26 см': 1
+[DEBUG] Пример label узла: 'Физическое описание'
+[DEBUG] Пример value узла: '192 с. : ил.; 26 см'
+[DEBUG] Пара 1: label='Физическое описание', value='192 с. : ил.; 26 см'
+[DEBUG] Добавлен фрагмент с тегом tr
+[DEBUG] Всего найдено уникальных фрагментов: 1
+
+🔍 Проверка URL: https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349
+
+=== Поиск пары: '' – 'Программирование на Python в примерах и задачах' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label '': 0
+[DEBUG] Найдено узлов с value 'Программирование на Python в примерах и задачах': 4
+[DEBUG] Пример value узла: 'Программирование на Python в примерах и задачах'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Добавлен фрагмент с тегом span
+[DEBUG] Добавлен фрагмент с тегом span
+[DEBUG] Добавлен фрагмент с тегом h1
+[DEBUG] Всего найдено уникальных фрагментов: 4
+
+=== Поиск пары: 'Год издания' – '2025' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Год издания': 1
+[DEBUG] Найдено узлов с value '2025': 3
+[DEBUG] Пример label узла: 'Год издания'
+[DEBUG] Пример value узла: '2025'
+[DEBUG] Пара 1: label='Год издания', value='2025'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Год издания', value='2025'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Год издания', value='2025'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+
+=== Поиск пары: '' – 'Алексей Васильев' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label '': 0
+[DEBUG] Найдено узлов с value 'Алексей Васильев': 3
+[DEBUG] Пример value узла: 'Алексей Васильев'
+[DEBUG] Добавлен фрагмент с тегом ul
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Добавлен фрагмент с тегом a
+[DEBUG] Всего найдено уникальных фрагментов: 3
+
+=== Поиск пары: 'Количество страниц' – '616' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Количество страниц': 1
+[DEBUG] Найдено узлов с value '616': 3
+[DEBUG] Пример label узла: 'Количество страниц'
+[DEBUG] Пример value узла: '616'
+[DEBUG] Пара 1: label='Количество страниц', value='616'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Количество страниц', value='616'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Количество страниц', value='616'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+
+🔍 Проверка URL: https://book.ru/book/943665
+
+=== Поиск пары: '' – 'Математика на Python' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label '': 0
+[DEBUG] Найдено узлов с value 'Математика на Python': 2
+[DEBUG] Пример value узла: 'Математика на Python'
+[DEBUG] Добавлен фрагмент с тегом h1
+[DEBUG] Добавлен фрагмент с тегом span
+[DEBUG] Всего найдено уникальных фрагментов: 2
+
+=== Поиск пары: 'Год издания:' – '2022' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Год издания:': 1
+[DEBUG] Найдено узлов с value '2022': 1
+[DEBUG] Пример label узла: 'Год издания:'
+[DEBUG] Пример value узла: '2022'
+[DEBUG] Пара 1: label='Год издания:', value='2022'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+
+=== Поиск пары: 'Авторы:' – 'Криволапов С.Я., Хрипунова М.Б.' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Авторы:': 1
+[DEBUG] Найдено узлов с value 'Криволапов С.Я., Хрипунова М.Б.': 3
+[DEBUG] Пример label узла: 'Авторы:'
+[DEBUG] Пример value узла: 'Криволапов С.Я.,Хрипунова М.Б.'
+[DEBUG] Пара 1: label='Авторы:', value='Криволапов С.Я.,Хрипунова М.Б.'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Авторы:', value='Криволапов С.Я.,Хрипунова М.Б.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Авторы:', value='Криволапов С.Я.,Хрипунова М.Б.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+
+=== Поиск пары: 'Объем:' – '455 стр.' ===
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Объем:': 1
+[DEBUG] Найдено узлов с value '455 стр.': 1
+[DEBUG] Пример label узла: 'Объем:'
+[DEBUG] Пример value узла: '455 стр.'
+[DEBUG] Пара 1: label='Объем:', value='455 стр.'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Найдено фрагментов: 12
+
+=== Фрагмент 1 ===
+URL: https://search.rsl.ru/ru/record/01010115385, Label: 'Автор', Value: 'МакГрат, Майк'
+--------------------------------------------------
+['<tr><th>Автор</th><td itemprop="author">МакГрат, Майк</td></tr>']
+==================================================
+
+=== Фрагмент 2 ===
+URL: https://search.rsl.ru/ru/record/01010115385, Label: 'Заглавие', Value: 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+'
+--------------------------------------------------
+['<tr><th>Заглавие</th><td itemprop="name">Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+</td></tr>']
+==================================================
+
+=== Фрагмент 3 ===
+URL: https://search.rsl.ru/ru/record/01010115385, Label: 'Выходные данные', Value: 'Москва : Эксмо, 2019'
+--------------------------------------------------
+['<tr><th>Выходные данные</th><td>Москва : Эксмо, 2019</td></tr>']
+==================================================
+
+=== Фрагмент 4 ===
+URL: https://search.rsl.ru/ru/record/01010115385, Label: 'Физическое описание', Value: '192 с. : ил.; 26 см'
+--------------------------------------------------
+['<tr><th>Физическое описание</th><td>192 с. : ил.; 26 см</td></tr>']
+==================================================
+
+=== Фрагмент 5 ===
+URL: https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349, Label: '', Value: 'Программирование на Python в примерах и задачах'
+--------------------------------------------------
+['<li class="breadcrumbs__item" style=""><!-- --><span class="global-link--line breadcrumbs__item breadcrumbs__item--span"><span class="breadcrumbs__item--last">Программирование на Python в примерах и задачах</span></span><!-- --></li>', '<span class="global-link--line breadcrumbs__item breadcrumbs__item--span"><span class="breadcrumbs__item--last">Программирование на Python в примерах и задачах</span></span>', '<span class="breadcrumbs__item--last">Программирование на Python в примерах и задачах</span>', '<h1 class="product-detail-page__title">Программирование на Python в примерах и задачах<!--[--><div></div><!--]--></h1>']
+==================================================
+
+=== Фрагмент 6 ===
+URL: https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349, Label: 'Год издания', Value: '2025'
+--------------------------------------------------
+['<li class="product-properties-item"><span class="product-properties-item__title">Год издания <!-- --></span><span class="product-properties-item__content"><span class="" itemprop="datePublished"><!--[--><!--[--><span>2025</span><!-- --><!--]--><!--]--></span><!-- --></span></li>']
+==================================================
+
+=== Фрагмент 7 ===
+URL: https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349, Label: '', Value: 'Алексей Васильев'
+--------------------------------------------------
+['<ul class="product-authors"><!--[--><li class="product-authors__link"><a class="global-link" href="/author/vasilev-aleksey-597580" itemprop="url">Алексей Васильев</a></li><!--]--></ul>', '<li class="product-authors__link"><a class="global-link" href="/author/vasilev-aleksey-597580" itemprop="url">Алексей Васильев</a></li>', '<a class="global-link" href="/author/vasilev-aleksey-597580" itemprop="url">Алексей Васильев</a>']
+==================================================
+
+=== Фрагмент 8 ===
+URL: https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349, Label: 'Количество страниц', Value: '616'
+--------------------------------------------------
+['<li class="product-properties-item"><span class="product-properties-item__title">Количество страниц <!-- --></span><span class="product-properties-item__content"><span class="" itemprop="numberOfPages"><!--[--><!--[--><span>616</span><!-- --><!--]--><!--]--></span><!-- --></span></li>']
+==================================================
+
+=== Фрагмент 9 ===
+URL: https://book.ru/book/943665, Label: '', Value: 'Математика на Python'
+--------------------------------------------------
+['<h1 class="book_PageTitle__2I49f" itemprop="name">Математика на Python</h1>', '<span style="cursor:pointer">математика на Python</span>']
+==================================================
+
+=== Фрагмент 10 ===
+URL: https://book.ru/book/943665, Label: 'Год издания:', Value: '2022'
+--------------------------------------------------
+['<li class="bookDataRow_item__Bh44I"><span class="bookDataRow_point__JI5op">Год издания<!-- -->:</span><span class="bookDataRow_value__0qIpl"><div><span class="book_value1__9QgSy" itemprop="copyrightYear">2022</span><div class="book_izdRow__NBM_r"><div class="book_izdName1__SgqHu">Новое издание:\xa0</div><div class="book_years__lTH33"><a href="/book/955467" target="_blank">2025</a></div></div></div></span></li>']
+==================================================
+
+=== Фрагмент 11 ===
+URL: https://book.ru/book/943665, Label: 'Авторы:', Value: 'Криволапов С.Я., Хрипунова М.Б.'
+--------------------------------------------------
+['<li class="bookDataRow_item__Bh44I"><span class="bookDataRow_point__JI5op">Авторы<!-- -->:</span><span class="bookDataRow_value__0qIpl"><div><div class="book_value__9FlCr book_row2__AEmH3" id="authorRow" itemprop="author"><a class="book_link__m1J2i" href="/extrasearch?author=%D0%9A%D1%80%D0%B8%D0%B2%D0%BE%D0%BB%D0%B0%D0%BF%D0%BE%D0%B2+%D0%A1.%D0%AF." target="_blank"><span style="cursor:pointer">Криволапов С.Я.</span>, </a><a class="book_link__m1J2i" href="/extrasearch?author=%D0%A5%D1%80%D0%B8%D0%BF%D1%83%D0%BD%D0%BE%D0%B2%D0%B0+%D0%9C.%D0%91." target="_blank"><span style="cursor:pointer"> Хрипунова М.Б.</span></a></div></div></span></li>']
+==================================================
+
+=== Фрагмент 12 ===
+URL: https://book.ru/book/943665, Label: 'Объем:', Value: '455 стр.'
+--------------------------------------------------
+['<li class="bookDataRow_item__Bh44I"><span class="bookDataRow_point__JI5op">Объем<!-- -->:</span><span class="bookDataRow_value__0qIpl">455 стр.</span></li>']
+==================================================
+
+=== Фрагмент для генерации паттерна ===
+('https://search.rsl.ru/ru/record/01010115385', 'Автор', 'МакГрат, Майк', ['<tr><th>Автор</th><td itemprop="author">МакГрат, Майк</td></tr>'], {'id': 'rsl', 'name': 'РГБ', 'base_url': 'https://search.rsl.ru', 'search_url_template': 'https://search.rsl.ru/ru/search?q={isbn}', 'product_link_selectors': ["a.rsl-modal[href^='/ru/record/']", 'div.rsl-itemaction-description-link a'], 'no_product_phrases': ['ничего не найдено', 'по вашему запросу ничего не найдено', 'не найдено'], 'title_selectors': [], 'author_selectors': [], 'pages_selectors': [], 'year_selectors': [], 'properties_item_class': None, 'properties_title_class': None, 'properties_content_class': None, 'source_label': 'РГБ', 'need_main_page': False, 'city_modal_xpath': None, 'custom_parser': <function _rsl_resource.<locals>.custom_parser at 0x00000244B871A820>})
+==================================================
+[DEBUG generate_pattern] label_text='Автор', value_text='МакГрат, Майк'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<td itemprop="author">МакГрат, Майк</td>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<tr><th>Автор</th><td itemprop="author">МакГрат, Майк</td></tr>
+[DEBUG generate_pattern] value_node.name=td
+[DEBUG generate_pattern] ancestor.name=tr
+Сгенерирован паттерн: xpath -> //*[.//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Автор', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]]//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Автор', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]/following-sibling::td (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://search.rsl.ru/ru/record/01010115385', 'Заглавие', 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+', ['<tr><th>Заглавие</th><td itemprop="name">Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+</td></tr>'], {'id': 'rsl', 'name': 'РГБ', 'base_url': 'https://search.rsl.ru', 'search_url_template': 'https://search.rsl.ru/ru/search?q={isbn}', 'product_link_selectors': ["a.rsl-modal[href^='/ru/record/']", 'div.rsl-itemaction-description-link a'], 'no_product_phrases': ['ничего не найдено', 'по вашему запросу ничего не найдено', 'не найдено'], 'title_selectors': [], 'author_selectors': [], 'pages_selectors': [], 'year_selectors': [], 'properties_item_class': None, 'properties_title_class': None, 'properties_content_class': None, 'source_label': 'РГБ', 'need_main_page': False, 'city_modal_xpath': None, 'custom_parser': <function _rsl_resource.<locals>.custom_parser at 0x00000244B871A4C0>})
+==================================================
+[DEBUG generate_pattern] label_text='Заглавие', value_text='Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<td itemprop="name">Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+</td>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<tr><th>Заглавие</th><td itemprop="name">Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+</td></tr>
+[DEBUG generate_pattern] value_node.name=td
+[DEBUG generate_pattern] ancestor.name=tr
+Сгенерирован паттерн: xpath -> //*[.//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Заглавие', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]]//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Заглавие', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]/following-sibling::td (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://search.rsl.ru/ru/record/01010115385', 'Выходные данные', 'Москва : Эксмо, 2019', ['<tr><th>Выходные данные</th><td>Москва : Эксмо, 2019</td></tr>'], {'id': 'rsl', 'name': 'РГБ', 'base_url': 'https://search.rsl.ru', 'search_url_template': 'https://search.rsl.ru/ru/search?q={isbn}', 'product_link_selectors': ["a.rsl-modal[href^='/ru/record/']", 'div.rsl-itemaction-description-link a'], 'no_product_phrases': ['ничего не найдено', 'по вашему запросу ничего не найдено', 'не найдено'], 'title_selectors': [], 'author_selectors': [], 'pages_selectors': [], 'year_selectors': [], 'properties_item_class': None, 'properties_title_class': None, 'properties_content_class': None, 'source_label': 'РГБ', 'need_main_page': False, 'city_modal_xpath': None, 'custom_parser': <function _rsl_resource.<locals>.custom_parser at 0x00000244B88BB3A0>})
+==================================================
+[DEBUG generate_pattern] label_text='Выходные данные', value_text='Москва : Эксмо, 2019'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<td>Москва : Эксмо, 2019</td>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<tr><th>Выходные данные</th><td>Москва : Эксмо, 2019</td></tr>
+[DEBUG generate_pattern] value_node.name=td
+[DEBUG generate_pattern] ancestor.name=tr
+Сгенерирован паттерн: xpath -> //*[.//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Выходные данные', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]]//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Выходные данные', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]/following-sibling::td (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://search.rsl.ru/ru/record/01010115385', 'Физическое описание', '192 с. : ил.; 26 см', ['<tr><th>Физическое описание</th><td>192 с. : ил.; 26 см</td></tr>'], {'id': 'rsl', 'name': 'РГБ', 'base_url': 'https://search.rsl.ru', 'search_url_template': 'https://search.rsl.ru/ru/search?q={isbn}', 'product_link_selectors': ["a.rsl-modal[href^='/ru/record/']", 'div.rsl-itemaction-description-link a'], 'no_product_phrases': ['ничего не найдено', 'по вашему запросу ничего не найдено', 'не найдено'], 'title_selectors': [], 'author_selectors': [], 'pages_selectors': [], 'year_selectors': [], 'properties_item_class': None, 'properties_title_class': None, 'properties_content_class': None, 'source_label': 'РГБ', 'need_main_page': False, 'city_modal_xpath': None, 'custom_parser': <function _rsl_resource.<locals>.custom_parser at 0x00000244B872AD30>})
+==================================================
+[DEBUG generate_pattern] label_text='Физическое описание', value_text='192 с. : ил.; 26 см'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<td>192 с. : ил.; 26 см</td>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<tr><th>Физическое описание</th><td>192 с. : ил.; 26 см</td></tr>
+[DEBUG generate_pattern] value_node.name=td
+[DEBUG generate_pattern] ancestor.name=tr
+Сгенерирован паттерн: xpath -> //*[.//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Физическое описание', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]]//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Физическое описание', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]/following-sibling::td (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349', '', 'Программирование на Python в примерах и задачах', ['<li class="breadcrumbs__item" style=""><!-- --><span class="global-link--line breadcrumbs__item breadcrumbs__item--span"><span class="breadcrumbs__item--last">Программирование на Python в примерах и задачах</span></span><!-- --></li>', '<span class="global-link--line breadcrumbs__item breadcrumbs__item--span"><span class="breadcrumbs__item--last">Программирование на Python в примерах и задачах</span></span>', '<span class="breadcrumbs__item--last">Программирование на Python в примерах и задачах</span>', '<h1 class="product-detail-page__title">Программирование на Python в примерах и задачах<!--[--><div></div><!--]--></h1>'], {'id': 'chitai-gorod', 'name': 'Читай-город', 'base_url': 'https://www.chitai-gorod.ru', 'search_url_template': 'https://www.chitai-gorod.ru/search?phrase={isbn}', 'product_link_selectors': ['a[href^="/product/"]', 'a.product-card__title', 'a.product-title', '.catalog-item a'], 'no_product_phrases': ['Похоже, у нас такого нет', 'ничего не нашлось'], 'title_selectors': ['h1.product-detail-page__title', 'h1.product-title', 'h1[itemprop="name"]', '.product__title h1', 'h1'], 'author_selectors': ['.product-authors a', '.product-author a', 'a[itemprop="author"]', '.product-info__author', '.authors-list a'], 'pages_selectors': ['span[itemprop="numberOfPages"] span', '.product-properties-item span[itemprop="numberOfPages"]'], 'year_selectors': ['span[itemprop="datePublished"] span', '.product-properties-item span[itemprop="datePublished"]'], 'properties_item_class': 'product-properties-item', 'properties_title_class': 'product-properties-item__title', 'properties_content_class': 'product-properties-item__content', 'source_label': 'Читай-город', 'need_main_page': True, 'city_modal_xpath': "//button[contains(text(), 'Да, я здесь')]"})
+==================================================
+[DEBUG generate_pattern] label_text='', value_text='Программирование на Python в примерах и задачах'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<span class="breadcrumbs__item--last">Программирование на Python в примерах и задачах</span>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<span class="breadcrumbs__item--last">Программирование на Python в примерах и задачах</span>
+[DEBUG generate_pattern] value_node.name=span
+[DEBUG generate_pattern] ancestor.name=span
+Сгенерирован паттерн: xpath -> //*[contains(@class, 'breadcrumbs__item--last')]//span (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349', 'Год издания', '2025', ['<li class="product-properties-item"><span class="product-properties-item__title">Год издания <!-- --></span><span class="product-properties-item__content"><span class="" itemprop="datePublished"><!--[--><!--[--><span>2025</span><!-- --><!--]--><!--]--></span><!-- --></span></li>'], {'id': 'chitai-gorod', 'name': 'Читай-город', 'base_url': 'https://www.chitai-gorod.ru', 'search_url_template': 'https://www.chitai-gorod.ru/search?phrase={isbn}', 'product_link_selectors': ['a[href^="/product/"]', 'a.product-card__title', 'a.product-title', '.catalog-item a'], 'no_product_phrases': ['Похоже, у нас такого нет', 'ничего не нашлось'], 'title_selectors': ['h1.product-detail-page__title', 'h1.product-title', 'h1[itemprop="name"]', '.product__title h1', 'h1'], 'author_selectors': ['.product-authors a', '.product-author a', 'a[itemprop="author"]', '.product-info__author', '.authors-list a'], 'pages_selectors': ['span[itemprop="numberOfPages"] span', '.product-properties-item span[itemprop="numberOfPages"]'], 'year_selectors': ['span[itemprop="datePublished"] span', '.product-properties-item span[itemprop="datePublished"]'], 'properties_item_class': 'product-properties-item', 'properties_title_class': 'product-properties-item__title', 'properties_content_class': 'product-properties-item__content', 'source_label': 'Читай-город', 'need_main_page': True, 'city_modal_xpath': "//button[contains(text(), 'Да, я здесь')]"})
+==================================================
+[DEBUG generate_pattern] label_text='Год издания', value_text='2025'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<span>2025</span>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<li class="product-properties-item"><span class="product-properties-item__title">Год издания <!-- --></span><span class="product-properties-item__content"><span class="" itemprop="datePublished"><!--[--><!--[--><span>2025</span><!-- --><!--]--><!--]--></span><!-- --></span></li>
+[DEBUG generate_pattern] value_node.name=span
+[DEBUG generate_pattern] ancestor.name=li
+Сгенерирован паттерн: xpath -> //*[contains(@class, 'product-properties-item__content')] (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349', '', 'Алексей Васильев', ['<ul class="product-authors"><!--[--><li class="product-authors__link"><a class="global-link" href="/author/vasilev-aleksey-597580" itemprop="url">Алексей Васильев</a></li><!--]--></ul>', '<li class="product-authors__link"><a class="global-link" href="/author/vasilev-aleksey-597580" itemprop="url">Алексей Васильев</a></li>', '<a class="global-link" href="/author/vasilev-aleksey-597580" itemprop="url">Алексей Васильев</a>'], {'id': 'chitai-gorod', 'name': 'Читай-город', 'base_url': 'https://www.chitai-gorod.ru', 'search_url_template': 'https://www.chitai-gorod.ru/search?phrase={isbn}', 'product_link_selectors': ['a[href^="/product/"]', 'a.product-card__title', 'a.product-title', '.catalog-item a'], 'no_product_phrases': ['Похоже, у нас такого нет', 'ничего не нашлось'], 'title_selectors': ['h1.product-detail-page__title', 'h1.product-title', 'h1[itemprop="name"]', '.product__title h1', 'h1'], 'author_selectors': ['.product-authors a', '.product-author a', 'a[itemprop="author"]', '.product-info__author', '.authors-list a'], 'pages_selectors': ['span[itemprop="numberOfPages"] span', '.product-properties-item span[itemprop="numberOfPages"]'], 'year_selectors': ['span[itemprop="datePublished"] span', '.product-properties-item span[itemprop="datePublished"]'], 'properties_item_class': 'product-properties-item', 'properties_title_class': 'product-properties-item__title', 'properties_content_class': 'product-properties-item__content', 'source_label': 'Читай-город', 'need_main_page': True, 'city_modal_xpath': "//button[contains(text(), 'Да, я здесь')]"})
+==================================================
+[DEBUG generate_pattern] label_text='', value_text='Алексей Васильев'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<a class="global-link" href="/author/vasilev-aleksey-597580" itemprop="url">Алексей Васильев</a>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<a class="global-link" href="/author/vasilev-aleksey-597580" itemprop="url">Алексей Васильев</a>
+[DEBUG generate_pattern] value_node.name=a
+[DEBUG generate_pattern] ancestor.name=a
+Сгенерирован паттерн: xpath -> //*[contains(@class, 'global-link')]//a (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349', 'Количество страниц', '616', ['<li class="product-properties-item"><span class="product-properties-item__title">Количество страниц <!-- --></span><span class="product-properties-item__content"><span class="" itemprop="numberOfPages"><!--[--><!--[--><span>616</span><!-- --><!--]--><!--]--></span><!-- --></span></li>'], {'id': 'chitai-gorod', 'name': 'Читай-город', 'base_url': 'https://www.chitai-gorod.ru', 'search_url_template': 'https://www.chitai-gorod.ru/search?phrase={isbn}', 'product_link_selectors': ['a[href^="/product/"]', 'a.product-card__title', 'a.product-title', '.catalog-item a'], 'no_product_phrases': ['Похоже, у нас такого нет', 'ничего не нашлось'], 'title_selectors': ['h1.product-detail-page__title', 'h1.product-title', 'h1[itemprop="name"]', '.product__title h1', 'h1'], 'author_selectors': ['.product-authors a', '.product-author a', 'a[itemprop="author"]', '.product-info__author', '.authors-list a'], 'pages_selectors': ['span[itemprop="numberOfPages"] span', '.product-properties-item span[itemprop="numberOfPages"]'], 'year_selectors': ['span[itemprop="datePublished"] span', '.product-properties-item span[itemprop="datePublished"]'], 'properties_item_class': 'product-properties-item', 'properties_title_class': 'product-properties-item__title', 'properties_content_class': 'product-properties-item__content', 'source_label': 'Читай-город', 'need_main_page': True, 'city_modal_xpath': "//button[contains(text(), 'Да, я здесь')]"})
+==================================================
+[DEBUG generate_pattern] label_text='Количество страниц', value_text='616'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<span>616</span>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<li class="product-properties-item"><span class="product-properties-item__title">Количество страниц <!-- --></span><span class="product-properties-item__content"><span class="" itemprop="numberOfPages"><!--[--><!--[--><span>616</span><!-- --><!--]--><!--]--></span><!-- --></span></li>
+[DEBUG generate_pattern] value_node.name=span
+[DEBUG generate_pattern] ancestor.name=li
+Сгенерирован паттерн: xpath -> //*[contains(@class, 'product-properties-item__content')] (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://book.ru/book/943665', '', 'Математика на Python', ['<h1 class="book_PageTitle__2I49f" itemprop="name">Математика на Python</h1>', '<span style="cursor:pointer">математика на Python</span>'], {'id': 'book-ru', 'name': 'Book.ru', 'base_url': 'https://book.ru', 'search_url_template': 'https://book.ru/search?q={isbn}', 'product_link_selectors': ['a[data-test-id="bookCardLink"]', 'a[href*="/book/"]'], 'no_product_phrases': ['ничего не найдено', 'ничего не найдено по запросу', 'по вашему запросу ничего не найдено', 'Книги / Новинки'], 'title_selectors': ['h1', 'meta[property="og:title"]'], 'author_selectors': ['[itemprop="author"]'], 'pages_selectors': [], 'year_selectors': [], 'properties_item_class': 'bookDataRow_item__Bh44I', 'properties_title_class': 'bookDataRow_point__JI5op', 'properties_content_class': 'bookDataRow_value__0qIpl', 'source_label': 'Book.ru', 'need_main_page': False, 'city_modal_xpath': None, 'custom_parser': <function _book_ru_resource.<locals>.custom_parser at 0x00000244B871A550>})
+==================================================
+[DEBUG generate_pattern] label_text='', value_text='Математика на Python'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<h1 class="book_PageTitle__2I49f" itemprop="name">Математика на Python</h1>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<h1 class="book_PageTitle__2I49f" itemprop="name">Математика на Python</h1>
+[DEBUG generate_pattern] value_node.name=h1
+[DEBUG generate_pattern] ancestor.name=h1
+Сгенерирован паттерн: xpath -> //*[contains(@class, 'book_PageTitle__2I49f')]//h1 (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://book.ru/book/943665', 'Год издания:', '2022', ['<li class="bookDataRow_item__Bh44I"><span class="bookDataRow_point__JI5op">Год издания<!-- -->:</span><span class="bookDataRow_value__0qIpl"><div><span class="book_value1__9QgSy" itemprop="copyrightYear">2022</span><div class="book_izdRow__NBM_r"><div class="book_izdName1__SgqHu">Новое издание:\xa0</div><div class="book_years__lTH33"><a href="/book/955467" target="_blank">2025</a></div></div></div></span></li>'], {'id': 'book-ru', 'name': 'Book.ru', 'base_url': 'https://book.ru', 'search_url_template': 'https://book.ru/search?q={isbn}', 'product_link_selectors': ['a[data-test-id="bookCardLink"]', 'a[href*="/book/"]'], 'no_product_phrases': ['ничего не найдено', 'ничего не найдено по запросу', 'по вашему запросу ничего не найдено', 'Книги / Новинки'], 'title_selectors': ['h1', 'meta[property="og:title"]'], 'author_selectors': ['[itemprop="author"]'], 'pages_selectors': [], 'year_selectors': [], 'properties_item_class': 'bookDataRow_item__Bh44I', 'properties_title_class': 'bookDataRow_point__JI5op', 'properties_content_class': 'bookDataRow_value__0qIpl', 'source_label': 'Book.ru', 'need_main_page': False, 'city_modal_xpath': None, 'custom_parser': <function _book_ru_resource.<locals>.custom_parser at 0x00000244B86C24C0>})
+==================================================
+[DEBUG generate_pattern] label_text='Год издания:', value_text='2022'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<span class="book_value1__9QgSy" itemprop="copyrightYear">2022</span>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<li class="bookDataRow_item__Bh44I"><span class="bookDataRow_point__JI5op">Год издания<!-- -->:</span><span class="bookDataRow_value__0qIpl"><div><span class="book_value1__9QgSy" itemprop="copyrightYear">2022</span><div class="book_izdRow__NBM_r"><div class="book_izdName1__SgqHu">Новое издание: </div><div class="book_years__lTH33"><a href="/book/955467" target="_blank">2025</a></div></div></div></span></li>
+[DEBUG generate_pattern] value_node.name=span
+[DEBUG generate_pattern] ancestor.name=li
+Сгенерирован паттерн: css -> .book_value1__9QgSy (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://book.ru/book/943665', 'Авторы:', 'Криволапов С.Я., Хрипунова М.Б.', ['<li class="bookDataRow_item__Bh44I"><span class="bookDataRow_point__JI5op">Авторы<!-- -->:</span><span class="bookDataRow_value__0qIpl"><div><div class="book_value__9FlCr book_row2__AEmH3" id="authorRow" itemprop="author"><a class="book_link__m1J2i" href="/extrasearch?author=%D0%9A%D1%80%D0%B8%D0%B2%D0%BE%D0%BB%D0%B0%D0%BF%D0%BE%D0%B2+%D0%A1.%D0%AF." target="_blank"><span style="cursor:pointer">Криволапов С.Я.</span>, </a><a class="book_link__m1J2i" href="/extrasearch?author=%D0%A5%D1%80%D0%B8%D0%BF%D1%83%D0%BD%D0%BE%D0%B2%D0%B0+%D0%9C.%D0%91." target="_blank"><span style="cursor:pointer"> Хрипунова М.Б.</span></a></div></div></span></li>'], {'id': 'book-ru', 'name': 'Book.ru', 'base_url': 'https://book.ru', 'search_url_template': 'https://book.ru/search?q={isbn}', 'product_link_selectors': ['a[data-test-id="bookCardLink"]', 'a[href*="/book/"]'], 'no_product_phrases': ['ничего не найдено', 'ничего не найдено по запросу', 'по вашему запросу ничего не найдено', 'Книги / Новинки'], 'title_selectors': ['h1', 'meta[property="og:title"]'], 'author_selectors': ['[itemprop="author"]'], 'pages_selectors': [], 'year_selectors': [], 'properties_item_class': 'bookDataRow_item__Bh44I', 'properties_title_class': 'bookDataRow_point__JI5op', 'properties_content_class': 'bookDataRow_value__0qIpl', 'source_label': 'Book.ru', 'need_main_page': False, 'city_modal_xpath': None, 'custom_parser': <function _book_ru_resource.<locals>.custom_parser at 0x00000244B8F1D820>})
+==================================================
+[DEBUG generate_pattern] label_text='Авторы:', value_text='Криволапов С.Я., Хрипунова М.Б.'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<div class="book_value__9FlCr book_row2__AEmH3" id="authorRow" itemprop="author"><a class="book_link__m1J2i" href="/extrasearch?author=%D0%9A%D1%80%D0%B8%D0%B2%D0%BE%D0%BB%D0%B0%D0%BF%D0%BE%D0%B2+%D0%A1.%D0%AF." target="_blank"><span style="cursor:pointer">Криволапов С.Я.</span>, </a><a class="book_link__m1J2i" href="/extrasearch?author=%D0%A5%D1%80%D0%B8%D0%BF%D1%83%D0%BD%D0%BE%D0%B2%D0%B0+%D0%9C.%D0%91." target="_blank"><span style="cursor:pointer"> Хрипунова М.Б.</span></a></div>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<li class="bookDataRow_item__Bh44I"><span class="bookDataRow_point__JI5op">Авторы<!-- -->:</span><span class="bookDataRow_value__0qIpl"><div><div class="book_value__9FlCr book_row2__AEmH3" id="authorRow" itemprop="author"><a class="book_link__m1J2i" href="/extrasearch?author=%D0%9A%D1%80%D0%B8%D0%B2%D0%BE%D0%BB%D0%B0%D0%BF%D0%BE%D0%B2+%D0%A1.%D0%AF." target="_blank"><span style="cursor:pointer">Криволапов С.Я.</span>, </a><a class="book_link__m1J2i" href="/extrasearch?author=%D0%A5%D1%80%D0%B8%D0%BF%D1%83%D0%BD%D0%BE%D0%B2%D0%B0+%D0%9C.%D0%91." target="_blank"><span style="cursor:pointer"> Хрипунова М.Б.</span></a></div></div></span></li>
+[DEBUG generate_pattern] value_node.name=div
+[DEBUG generate_pattern] ancestor.name=li
+Сгенерирован паттерн: css -> #authorRow (атрибут: text)
+
+=== Фрагмент для генерации паттерна ===
+('https://book.ru/book/943665', 'Объем:', '455 стр.', ['<li class="bookDataRow_item__Bh44I"><span class="bookDataRow_point__JI5op">Объем<!-- -->:</span><span class="bookDataRow_value__0qIpl">455 стр.</span></li>'], {'id': 'book-ru', 'name': 'Book.ru', 'base_url': 'https://book.ru', 'search_url_template': 'https://book.ru/search?q={isbn}', 'product_link_selectors': ['a[data-test-id="bookCardLink"]', 'a[href*="/book/"]'], 'no_product_phrases': ['ничего не найдено', 'ничего не найдено по запросу', 'по вашему запросу ничего не найдено', 'Книги / Новинки'], 'title_selectors': ['h1', 'meta[property="og:title"]'], 'author_selectors': ['[itemprop="author"]'], 'pages_selectors': [], 'year_selectors': [], 'properties_item_class': 'bookDataRow_item__Bh44I', 'properties_title_class': 'bookDataRow_point__JI5op', 'properties_content_class': 'bookDataRow_value__0qIpl', 'source_label': 'Book.ru', 'need_main_page': False, 'city_modal_xpath': None, 'custom_parser': <function _book_ru_resource.<locals>.custom_parser at 0x00000244B872AC10>})
+==================================================
+[DEBUG generate_pattern] label_text='Объем:', value_text='455 стр.'
+[DEBUG generate_pattern] value_node type=<class 'bs4.element.Tag'>, value_node=<span class="bookDataRow_value__0qIpl">455 стр.</span>
+[DEBUG generate_pattern] ancestor type=<class 'bs4.element.Tag'>, ancestor=<li class="bookDataRow_item__Bh44I"><span class="bookDataRow_point__JI5op">Объем<!-- -->:</span><span class="bookDataRow_value__0qIpl">455 стр.</span></li>
+[DEBUG generate_pattern] value_node.name=span
+[DEBUG generate_pattern] ancestor.name=li
+Сгенерирован паттерн: css -> .bookDataRow_value__0qIpl (атрибут: text)
+
+🔍 Проверка URL: https://search.rsl.ru/ru/record/01010115385 (ресурс: rsl)
+   Доступно паттернов для ресурса: 4
+
+=== Поиск пары: 'Автор' – 'МакГрат, Майк' ===
+[DEBUG] Используется паттерн: xpath -> //*[.//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Автор', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]]//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Автор', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]/following-sibling::td
+[DEBUG] Паттерн соответствует: label='Автор', value='МакГрат, Майк'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Автор': 5
+[DEBUG] Найдено узлов с value 'МакГрат, Майк': 1
+[DEBUG] Пример label узла: 'Автор'
+[DEBUG] Пример value узла: 'МакГрат, Майк'
+[DEBUG] Пара 1: label='Автор', value='МакГрат, Майк'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 2: label='Автор', value='МакГрат, Майк'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 3: label='Автор', value='МакГрат, Майк'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 4: label='Автор', value='МакГрат, Майк'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 5: label='Автор', value='МакГрат, Майк'
+[DEBUG] Добавлен фрагмент с тегом tr
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: МакГрат, Майк
+
+=== Поиск пары: 'Заглавие' – 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+' ===
+[DEBUG] Используется паттерн: xpath -> //*[.//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Заглавие', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]]//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Заглавие', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]/following-sibling::td
+[DEBUG] Паттерн соответствует: label='Заглавие', value='Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Заглавие': 5
+[DEBUG] Найдено узлов с value 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+': 1
+[DEBUG] Пример label узла: 'Заглавие'
+[DEBUG] Пример value узла: 'Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной'
+[DEBUG] Пара 1: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 2: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 3: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 4: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Пропущен предок с тегом body
+[DEBUG] Пара 5: label='Заглавие', value='Программирование на Python : Python. Программирова'
+[DEBUG] Добавлен фрагмент с тегом tr
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: Программирование на Python : Python. Программирование для начинающих : первый шаг на пути к успешной карьере : для версий 3.1 - 3.4 : 12+
+
+=== Поиск пары: 'Выходные данные' – 'Москва : Эксмо, 2019' ===
+[DEBUG] Используется паттерн: xpath -> //*[.//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Выходные данные', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]]//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Выходные данные', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]/following-sibling::td
+[DEBUG] Паттерн соответствует: label='Выходные данные', value='Москва : Эксмо, 2019'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Выходные данные': 1
+[DEBUG] Найдено узлов с value 'Москва : Эксмо, 2019': 1
+[DEBUG] Пример label узла: 'Выходные данные'
+[DEBUG] Пример value узла: 'Москва : Эксмо, 2019'
+[DEBUG] Пара 1: label='Выходные данные', value='Москва : Эксмо, 2019'
+[DEBUG] Добавлен фрагмент с тегом tr
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: Москва : Эксмо, 2019
+
+=== Поиск пары: 'Физическое описание' – '192 с. : ил.; 26 см' ===
+[DEBUG] Используется паттерн: xpath -> //*[.//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Физическое описание', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]]//th[translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя') = translate('Физическое описание', 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя')]/following-sibling::td
+[DEBUG] Паттерн соответствует: label='Физическое описание', value='192 с. : ил.; 26 см'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Физическое описание': 1
+[DEBUG] Найдено узлов с value '192 с. : ил.; 26 см': 1
+[DEBUG] Пример label узла: 'Физическое описание'
+[DEBUG] Пример value узла: '192 с. : ил.; 26 см'
+[DEBUG] Пара 1: label='Физическое описание', value='192 с. : ил.; 26 см'
+[DEBUG] Добавлен фрагмент с тегом tr
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: 192 с. : ил.; 26 см
+
+🔍 Проверка URL: https://www.chitai-gorod.ru/product/programmirovanie-na-python-v-primerah-i-zadachah-2832349 (ресурс: chitai-gorod)
+   Доступно паттернов для ресурса: 4
+
+=== Поиск пары: '' – 'Программирование на Python в примерах и задачах' ===
+[DEBUG] Используется паттерн: xpath -> //*[contains(@class, 'breadcrumbs__item--last')]//span
+[DEBUG] Паттерн соответствует: label='', value='Программирование на Python в примерах и задачах'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label '': 0
+[DEBUG] Найдено узлов с value 'Программирование на Python в примерах и задачах': 4
+[DEBUG] Пример value узла: 'Программирование на Python в примерах и задачах'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Добавлен фрагмент с тегом span
+[DEBUG] Добавлен фрагмент с тегом span
+[DEBUG] Добавлен фрагмент с тегом h1
+[DEBUG] Всего найдено уникальных фрагментов: 4
+Извлечённое значение: None
+
+=== Поиск пары: 'Год издания' – '2025' ===
+[DEBUG] Используется паттерн: xpath -> //*[contains(@class, 'product-properties-item__content')]
+[DEBUG] Паттерн соответствует: label='Год издания', value='2025'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Год издания': 1
+[DEBUG] Найдено узлов с value '2025': 3
+[DEBUG] Пример label узла: 'Год издания'
+[DEBUG] Пример value узла: '2025'
+[DEBUG] Пара 1: label='Год издания', value='2025'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Год издания', value='2025'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Год издания', value='2025'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: 2025
+
+=== Поиск пары: '' – 'Алексей Васильев' ===
+[DEBUG] Используется паттерн: xpath -> //*[contains(@class, 'global-link')]//a
+[DEBUG] Паттерн соответствует: label='', value='Алексей Васильев'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label '': 0
+[DEBUG] Найдено узлов с value 'Алексей Васильев': 3
+[DEBUG] Пример value узла: 'Алексей Васильев'
+[DEBUG] Добавлен фрагмент с тегом ul
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Добавлен фрагмент с тегом a
+[DEBUG] Всего найдено уникальных фрагментов: 3
+Извлечённое значение: None
+
+=== Поиск пары: 'Количество страниц' – '616' ===
+[DEBUG] Используется паттерн: xpath -> //*[contains(@class, 'product-properties-item__content')]
+[DEBUG] Паттерн соответствует: label='Количество страниц', value='616'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Количество страниц': 1
+[DEBUG] Найдено узлов с value '616': 3
+[DEBUG] Пример label узла: 'Количество страниц'
+[DEBUG] Пример value узла: '616'
+[DEBUG] Пара 1: label='Количество страниц', value='616'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Количество страниц', value='616'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Количество страниц', value='616'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: 616
+
+🔍 Проверка URL: https://book.ru/book/943665 (ресурс: book-ru)
+   Доступно паттернов для ресурса: 4
+
+=== Поиск пары: '' – 'Математика на Python' ===
+[DEBUG] Используется паттерн: xpath -> //*[contains(@class, 'book_PageTitle__2I49f')]//h1
+[DEBUG] Паттерн соответствует: label='', value='Математика на Python'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label '': 0
+[DEBUG] Найдено узлов с value 'Математика на Python': 2
+[DEBUG] Пример value узла: 'Математика на Python'
+[DEBUG] Добавлен фрагмент с тегом h1
+[DEBUG] Добавлен фрагмент с тегом span
+[DEBUG] Всего найдено уникальных фрагментов: 2
+Извлечённое значение: None
+
+=== Поиск пары: 'Год издания:' – '2022' ===
+[DEBUG] Используется паттерн: css -> .book_value1__9QgSy
+[DEBUG] Паттерн соответствует: label='Год издания:', value='2022'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Год издания:': 1
+[DEBUG] Найдено узлов с value '2022': 1
+[DEBUG] Пример label узла: 'Год издания:'
+[DEBUG] Пример value узла: '2022'
+[DEBUG] Пара 1: label='Год издания:', value='2022'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: 2022
+
+=== Поиск пары: 'Авторы:' – 'Криволапов С.Я., Хрипунова М.Б.' ===
+[DEBUG] Используется паттерн: css -> #authorRow
+[DEBUG] Паттерн соответствует: label='Авторы:', value='Криволапов С.Я., Хрипунова М.Б.'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Авторы:': 1
+[DEBUG] Найдено узлов с value 'Криволапов С.Я., Хрипунова М.Б.': 3
+[DEBUG] Пример label узла: 'Авторы:'
+[DEBUG] Пример value узла: 'Криволапов С.Я.,Хрипунова М.Б.'
+[DEBUG] Пара 1: label='Авторы:', value='Криволапов С.Я.,Хрипунова М.Б.'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Авторы:', value='Криволапов С.Я.,Хрипунова М.Б.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Авторы:', value='Криволапов С.Я.,Хрипунова М.Б.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: Криволапов С.Я.,Хрипунова М.Б.
+
+=== Поиск пары: 'Объем:' – '455 стр.' ===
+[DEBUG] Используется паттерн: css -> .bookDataRow_value__0qIpl
+[DEBUG] Паттерн соответствует: label='Объем:', value='455 стр.'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Объем:': 1
+[DEBUG] Найдено узлов с value '455 стр.': 1
+[DEBUG] Пример label узла: 'Объем:'
+[DEBUG] Пример value узла: '455 стр.'
+[DEBUG] Пара 1: label='Объем:', value='455 стр.'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: 455 стр.
+
+🔍 Проверка URL: https://book.ru/book/962004 (ресурс: book-ru)
+   Доступно паттернов для ресурса: 4
+
+=== Поиск пары: '' – 'Многомерный анализ данных на Python' ===
+[DEBUG] Используется паттерн: xpath -> //*[contains(@class, 'book_PageTitle__2I49f')]//h1
+[DEBUG] Паттерн соответствует: label='', value='Математика на Python'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label '': 0
+[DEBUG] Найдено узлов с value 'Многомерный анализ данных на Python': 1
+[DEBUG] Пример value узла: 'Многомерный анализ данных на Python'
+[DEBUG] Добавлен фрагмент с тегом h1
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: None
+
+=== Поиск пары: 'Год издания:' – '2026' ===
+[DEBUG] Используется паттерн: css -> .book_value1__9QgSy
+[DEBUG] Паттерн соответствует: label='Год издания:', value='2022'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Год издания:': 1
+[DEBUG] Найдено узлов с value '2026': 3
+[DEBUG] Пример label узла: 'Год издания:'
+[DEBUG] Пример value узла: '2026'
+[DEBUG] Пара 1: label='Год издания:', value='2026'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Год издания:', value='2026'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Год издания:', value='2026'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: 2026
+
+=== Поиск пары: 'Авторы:' – 'Паршинцева Л.С., Паршинцев А.А.' ===
+[DEBUG] Используется паттерн: css -> #authorRow
+[DEBUG] Паттерн соответствует: label='Авторы:', value='Криволапов С.Я., Хрипунова М.Б.'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Авторы:': 1
+[DEBUG] Найдено узлов с value 'Паршинцева Л.С., Паршинцев А.А.': 3
+[DEBUG] Пример label узла: 'Авторы:'
+[DEBUG] Пример value узла: 'Паршинцева Л.С.,Паршинцев А.А.'
+[DEBUG] Пара 1: label='Авторы:', value='Паршинцева Л.С.,Паршинцев А.А.'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Авторы:', value='Паршинцева Л.С.,Паршинцев А.А.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Авторы:', value='Паршинцева Л.С.,Паршинцев А.А.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: Паршинцева Л.С.,Паршинцев А.А.
+
+=== Поиск пары: 'Объем:' – '129 стр.' ===
+[DEBUG] Используется паттерн: css -> .bookDataRow_value__0qIpl
+[DEBUG] Паттерн соответствует: label='Объем:', value='455 стр.'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Объем:': 1
+[DEBUG] Найдено узлов с value '129 стр.': 1
+[DEBUG] Пример label узла: 'Объем:'
+[DEBUG] Пример value узла: '129 стр.'
+[DEBUG] Пара 1: label='Объем:', value='129 стр.'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: 129 стр.
+
+🔍 Проверка URL: https://book.ru/book/960946 (ресурс: book-ru)
+   Доступно паттернов для ресурса: 4
+
+=== Поиск пары: '' – 'Практикум изучения языка программирования PYTHON. Начальный уровень' ===
+[DEBUG] Используется паттерн: xpath -> //*[contains(@class, 'book_PageTitle__2I49f')]//h1
+[DEBUG] Паттерн соответствует: label='', value='Математика на Python'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label '': 0
+[DEBUG] Найдено узлов с value 'Практикум изучения языка программирования PYTHON. Начальный уровень': 1
+[DEBUG] Пример value узла: 'Практикум изучения языка программирования PYTHON. Начальный уровень'
+[DEBUG] Добавлен фрагмент с тегом h1
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: None
+
+=== Поиск пары: 'Год издания:' – '2026' ===
+[DEBUG] Используется паттерн: css -> .book_value1__9QgSy
+[DEBUG] Паттерн соответствует: label='Год издания:', value='2022'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Год издания:': 1
+[DEBUG] Найдено узлов с value '2026': 3
+[DEBUG] Пример label узла: 'Год издания:'
+[DEBUG] Пример value узла: '2026'
+[DEBUG] Пара 1: label='Год издания:', value='2026'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Год издания:', value='2026'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Год издания:', value='2026'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: 2026
+
+=== Поиск пары: 'Авторы:' – 'Щербаков А.Г.' ===
+[DEBUG] Используется паттерн: css -> #authorRow
+[DEBUG] Паттерн соответствует: label='Авторы:', value='Криволапов С.Я., Хрипунова М.Б.'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Авторы:': 1
+[DEBUG] Найдено узлов с value 'Щербаков А.Г.': 5
+[DEBUG] Пример label узла: 'Авторы:'
+[DEBUG] Пример value узла: 'Щербаков А.Г.'
+[DEBUG] Пара 1: label='Авторы:', value='Щербаков А.Г.'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Пара 2: label='Авторы:', value='Щербаков А.Г.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 3: label='Авторы:', value='Щербаков А.Г.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 4: label='Авторы:', value='Щербаков А.Г.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Пара 5: label='Авторы:', value='Щербаков А.Г.'
+[DEBUG] Пропущен дубликат предка li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: Щербаков А.Г.
+
+=== Поиск пары: 'Объем:' – '116 стр.' ===
+[DEBUG] Используется паттерн: css -> .bookDataRow_value__0qIpl
+[DEBUG] Паттерн соответствует: label='Объем:', value='455 стр.'
+[DEBUG] Режим поиска: element
+[DEBUG] Найдено узлов с label 'Объем:': 1
+[DEBUG] Найдено узлов с value '116 стр.': 1
+[DEBUG] Пример label узла: 'Объем:'
+[DEBUG] Пример value узла: '116 стр.'
+[DEBUG] Пара 1: label='Объем:', value='116 стр.'
+[DEBUG] Добавлен фрагмент с тегом li
+[DEBUG] Всего найдено уникальных фрагментов: 1
+Извлечённое значение: 116 стр.

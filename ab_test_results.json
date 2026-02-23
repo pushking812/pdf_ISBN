@@ -1,0 +1,62 @@
+{
+  "timestamp": 1771810673.3880408,
+  "isbns": [
+    "9785171125953",
+    "9785446114426"
+  ],
+  "legacy_system": {
+    "system_name": "Старая система (вкладки)",
+    "total_isbns": 2,
+    "found_books": 0,
+    "success_rate": 0.0,
+    "total_time": 0.6939036846160889,
+    "avg_time_per_isbn": 0.34695184230804443,
+    "errors": [
+      "Ошибка в старой системе: parallel_search_with_progress() missing 1 required positional argument: 'progress_callback'"
+    ],
+    "sources": {}
+  },
+  "new_system": {
+    "system_name": "Новая система (TabManager)",
+    "total_isbns": 2,
+    "found_books": 0,
+    "success_rate": 0.0,
+    "total_time": 6.957650423049927,
+    "avg_time_per_isbn": 3.4788252115249634,
+    "errors": [],
+    "sources": {}
+  },
+  "comparison": {
+    "comparison": {
+      "success_rate": {
+        "legacy": 0.0,
+        "new": 0.0,
+        "difference": 0.0,
+        "difference_percent": 0
+      },
+      "total_time": {
+        "legacy": 0.6939036846160889,
+        "new": 6.957650423049927,
+        "difference": 6.263746738433838,
+        "difference_percent": 902.6824438753825
+      },
+      "avg_time_per_isbn": {
+        "legacy": 0.34695184230804443,
+        "new": 3.4788252115249634,
+        "difference": 3.131873369216919,
+        "difference_percent": 902.6824438753825
+      },
+      "found_books": {
+        "legacy": 0,
+        "new": 0,
+        "difference": 0
+      }
+    },
+    "winner": "Старая система (быстрее)",
+    "improvement_percentage": 0
+  },
+  "metadata": {
+    "books_dir": "_books",
+    "max_isbns": 2
+  }
+}
